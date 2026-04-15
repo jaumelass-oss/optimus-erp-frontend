@@ -1,0 +1,39 @@
+<div class="contenedor">
+  <h2>Gestión de Activos - Optimus ERP</h2>
+
+  <div class="formulario-seccion">
+    <input [(ngModel)]="nuevoActivo.nombre" placeholder="Nombre del equipo">
+    <input [(ngModel)]="nuevoActivo.numeroSerie" placeholder="Número de Serie">
+    <select [(ngModel)]="nuevoActivo.tipo">
+      <option value="LAPTOP">Laptop</option>
+      <option value="PERIFERICO">Periférico</option>
+      <option value="LICENCIA">Licencia</option>
+    </select>
+    <input type="number" [(ngModel)]="nuevoActivo.valor" placeholder="Precio">
+    <input type="number" [(ngModel)]="nuevoActivo.stock" placeholder="Cantidad">
+    <button (click)="guardar()">Añadir al Inventario</button>
+  </div>
+
+  <table class="tabla-erp">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Categoría</th>
+        <th>Nº Serie</th>
+        <th>Valor (€)</th>
+        <th>Stock</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let a of activos">
+        <td>{{ a.id }}</td>
+        <td><strong>{{ a.nombre }}</strong></td>
+        <td>{{ a.tipo }}</td>
+        <td>{{ a.numeroSerie }}</td>
+        <td>{{ a.valor }}</td>
+        <td>{{ a.stock }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
