@@ -1,9 +1,9 @@
 export interface Activo {
   id?: number;
   nombre: string;
-  numeroSerie: string;
+  numero_serie: string;
   tipo: string;
   valor: number;
   stock: number;
-  empleadoId?: number; 
+  empleado_Id?: number; 
 }

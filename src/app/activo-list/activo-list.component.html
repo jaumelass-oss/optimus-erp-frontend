@@ -1,39 +1,44 @@
-<div class="contenedor">
-  <h2>Gestión de Activos - Optimus ERP</h2>
+<div class="inventory-page">
+  <header class="content-header">
+    <h1>Operaciones de Inventario</h1>
+    <p>Gestión y control de activos de la empresa</p>
+  </header>
 
-  <div class="formulario-seccion">
-    <input [(ngModel)]="nuevoActivo.nombre" placeholder="Nombre del equipo">
-    <input [(ngModel)]="nuevoActivo.numeroSerie" placeholder="Número de Serie">
-    <select [(ngModel)]="nuevoActivo.tipo">
-      <option value="LAPTOP">Laptop</option>
-      <option value="PERIFERICO">Periférico</option>
-      <option value="LICENCIA">Licencia</option>
-    </select>
-    <input type="number" [(ngModel)]="nuevoActivo.valor" placeholder="Precio">
-    <input type="number" [(ngModel)]="nuevoActivo.stock" placeholder="Cantidad">
-    <button (click)="guardar()">Añadir al Inventario</button>
-  </div>
+  <section class="inventory-card mb-4">
+    <h4>Registrar Nuevo Activo</h4>
+    <form (ngSubmit)="guardar()" class="form-grid">
+      <input [(ngModel)]="nuevoActivo.nombre" name="nombre" placeholder="Nombre" class="form-control">
+      <input [(ngModel)]="nuevoActivo.numero_serie" name="numero_serie" placeholder="Nº Serie" class="form-control">
+      <input [(ngModel)]="nuevoActivo.valor" name="valor" type="number" placeholder="Precio (€)" class="form-control">
+      <input [(ngModel)]="nuevoActivo.stock" name="stock" type="number" placeholder="Cantidad" class="form-control">
+      <button type="submit" class="btn-add">Añadir al Inventario</button>
+    </form>
+  </section>
 
-  <table class="tabla-erp">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Nombre</th>
-        <th>Categoría</th>
-        <th>Nº Serie</th>
-        <th>Valor (€)</th>
-        <th>Stock</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let a of activos">
-        <td>{{ a.id }}</td>
-        <td><strong>{{ a.nombre }}</strong></td>
-        <td>{{ a.tipo }}</td>
-        <td>{{ a.numeroSerie }}</td>
-        <td>{{ a.valor }}</td>
-        <td>{{ a.stock }}</td>
-      </tr>
-    </tbody>
-  </table>
+  <section class="inventory-card">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Número de Serie</th>
+          <th>Tipo</th>
+          <th>Valor Unitario</th>
+          <th>Stock</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let activo of activos">
+          <td>{{ activo.nombre }}</td>
+          <td>{{ activo.numero_serie }}</td>
+          <td><span class="badge">{{ activo.tipo }}</span></td>
+          <td>{{ activo.valor | currency:'EUR' }}</td>
+          <td><strong>{{ activo.stock }}</strong> uds</td>
+          <td>
+            <button class="btn-icon delete"><i class="fas fa-trash"></i></button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
 </div>

@@ -1,4 +1,33 @@
-<main>
-  <h1>Bienvenido a Optimus ERP</h1>
-  <app-activo-list></app-activo-list>
-</main>
+<div class="app-container">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <span class="brand">Optimus ERP</span>
+    </div>
+    
+    <nav class="sidebar-menu">
+      <a routerLink="/dashboard" routerLinkActive="active">
+        <i class="fas fa-chart-line"></i> Dashboard
+      </a>
+      <a routerLink="/inventario" routerLinkActive="active">
+        <i class="fas fa-boxes"></i> Inventario
+      </a>
+      <a routerLink="/empleados" routerLinkActive="active">
+        <i class="fas fa-users"></i> Empleados
+      </a>
+      <a href="#"><i class="fas fa-file-invoice"></i> Facturación</a>
+      <a href="#"><i class="fas fa-cog"></i> Configuración</a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="logout-btn">
+        <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+      </button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="content-padding">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

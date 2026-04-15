@@ -1,10 +1,12 @@
 import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router'; 
+import { DashboardComponent } from './dashboard/dashboard';
 import { ActivoListComponent } from './activo-list/activo-list.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ActivoListComponent],
+  standalone: true,
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, DashboardComponent, ActivoListComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

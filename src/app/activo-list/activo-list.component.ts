@@ -16,7 +16,7 @@ export class ActivoListComponent implements OnInit {
 
   nuevoActivo: Activo = {
     nombre: '',
-    numeroSerie: '',
+    numero_serie: '',
     tipo: 'LAPTOP',
     valor: 0,
     stock: 0
@@ -42,7 +42,7 @@ export class ActivoListComponent implements OnInit {
       this.cargarActivos();
       this.nuevoActivo = {
         nombre: '',
-        numeroSerie: '',
+        numero_serie: '',
         tipo: 'LAPTOP',
         valor: 0,
         stock: 0
