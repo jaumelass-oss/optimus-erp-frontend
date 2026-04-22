@@ -1,34 +1,54 @@
 <div class="dashboard-wrapper">
-    <h2 class="section-title">Resumen de Inventario</h2>
-    
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon icon-blue">
-          <i class="fas fa-dollar-sign"></i> </div>
-        <div class="stat-info">
-          <span class="stat-label">Valor Total Inventario</span>
-          <div class="stat-value">{{ stats.totalValor | currency:'EUR' }}</div>
-        </div>
-      </div>
+  <h2 class="section-title">Resumen de Inventario</h2>
   
-      <div class="stat-card">
-        <div class="stat-icon icon-green">
-          <i class="fas fa-boxes"></i>
-        </div>
-        <div class="stat-info">
-          <span class="stat-label">Stock Total</span>
-          <div class="stat-value">{{ stats.totalUnidades }} uds</div>
-        </div>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon icon-blue">
+        <i class="fas fa-dollar-sign"></i> 
       </div>
-  
-      <div class="stat-card">
-        <div class="stat-icon icon-red">
-          <i class="fas fa-exclamation-triangle"></i>
+      <div class="stat-info">
+        <span class="stat-label">Valor Total Inventario</span>
+        <div class="stat-value">{{ stats.totalValor | currency:'EUR' }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon icon-green">
+        <i class="fas fa-boxes"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Stock Total</span>
+        <div class="stat-value">{{ stats.totalUnidades }} uds</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon icon-red">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Alertas de Stock</span>
+        <div class="stat-value">{{ stats.alertaStock }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="distribution-section">
+    <h3 class="subsection-title">Distribución por Categoría</h3>
+    <div class="category-list">
+      <div class="category-item" *ngFor="let cat of stats.categorias">
+        <div class="category-info">
+          <span class="cat-name">{{ cat.tipo }}</span>
+          <span class="cat-percentage">{{ cat.porcentaje }}%</span>
         </div>
-        <div class="stat-info">
-          <span class="stat-label">Alertas de Stock</span>
-          <div class="stat-value">{{ stats.alertaStock }}</div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" [style.width.%]="cat.porcentaje"></div>
+        </div>
+        <div class="cat-footer">
+          <span>{{ cat.cantidad }} activos</span>
+          <span>{{ cat.valorTotal | currency:'EUR' }}</span>
         </div>
       </div>
     </div>
   </div>
+</div>

@@ -49,4 +49,20 @@ export class ActivoListComponent implements OnInit {
       };
     });
   }
+
+  eliminar(id?: number): void {
+    if (id !== undefined) {
+      if (confirm('¿Estás seguro de que deseas eliminar este activo?')) {
+        this.service.eliminarActivo(id).subscribe({
+          next: () => {
+            this.cargarActivos();
+          },
+          error: (err) => {
+            console.error('Error al eliminar el activo:', err);
+            alert('No se pudo eliminar el activo.');
+          }
+        });
+      }
+    }
+  }
 }

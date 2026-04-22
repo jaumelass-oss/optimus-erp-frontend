@@ -1,44 +1,58 @@
 <div class="inventory-page">
   <header class="content-header">
     <h1>Operaciones de Inventario</h1>
-    <p>Gestión y control de activos de la empresa</p>
+    <p>Gestión y control de activos para <strong>Principal33</strong></p>
   </header>
 
   <section class="inventory-card mb-4">
-    <h4>Registrar Nuevo Activo</h4>
-    <form (ngSubmit)="guardar()" class="form-grid">
-      <input [(ngModel)]="nuevoActivo.nombre" name="nombre" placeholder="Nombre" class="form-control">
-      <input [(ngModel)]="nuevoActivo.numero_serie" name="numero_serie" placeholder="Nº Serie" class="form-control">
-      <input [(ngModel)]="nuevoActivo.valor" name="valor" type="number" placeholder="Precio (€)" class="form-control">
-      <input [(ngModel)]="nuevoActivo.stock" name="stock" type="number" placeholder="Cantidad" class="form-control">
-      <button type="submit" class="btn-add">Añadir al Inventario</button>
+    <h4 class="form-title">Registrar Nuevo Activo</h4>
+    <form (ngSubmit)="guardar()" class="form-flex-row">
+      <div class="field-group name">
+        <label>Nombre</label>
+        <input [(ngModel)]="nuevoActivo.nombre" name="nombre" placeholder="Nombre del activo" class="form-input">
+      </div>
+      <div class="field-group serial">
+        <label>Nº Serie</label>
+        <input [(ngModel)]="nuevoActivo.numero_serie" name="numero_serie" placeholder="Nº Serie" class="form-input">
+      </div>
+      <div class="field-group val">
+        <label>Precio</label>
+        <input [(ngModel)]="nuevoActivo.valor" name="valor" type="number" class="form-input">
+      </div>
+      <div class="field-group stock">
+        <label>Cantidad</label>
+        <input [(ngModel)]="nuevoActivo.stock" name="stock" type="number" class="form-input">
+      </div>
+      <button type="submit" class="btn-submit-action">
+        <i class="fas fa-plus"></i> Añadir
+      </button>
     </form>
   </section>
 
-  <section class="inventory-card">
-    <table class="custom-table">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Número de Serie</th>
-          <th>Tipo</th>
-          <th>Valor Unitario</th>
-          <th>Stock</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let activo of activos">
-          <td>{{ activo.nombre }}</td>
-          <td>{{ activo.numero_serie }}</td>
-          <td><span class="badge">{{ activo.tipo }}</span></td>
-          <td>{{ activo.valor | currency:'EUR' }}</td>
-          <td><strong>{{ activo.stock }}</strong> uds</td>
-          <td>
-            <button class="btn-icon delete"><i class="fas fa-trash"></i></button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <section class="list-wrapper">
+    <div class="list-head">
+      <div class="col-name">Nombre</div>
+      <div class="col-serial">Nº Serie</div>
+      <div class="col-price">Valor</div>
+      <div class="col-stock">Stock</div>
+      <div class="col-actions">Acciones</div>
+    </div>
+
+    <div class="list-row" *ngFor="let activo of activos">
+      <div class="col-name">
+        <span class="main-text">{{ activo.nombre }}</span>
+        <span class="type-tag">{{ activo.tipo }}</span>
+      </div>
+      <div class="col-serial">{{ activo.numero_serie }}</div>
+      <div class="col-price">{{ activo.valor | currency:'EUR' }}</div>
+      <div class="col-stock">
+        <strong [style.color]="activo.stock <= 5 ? '#e74c3c' : '#27ae60'">{{ activo.stock }}</strong> uds
+      </div>
+      <div class="col-actions">
+        <button (click)="eliminar(activo.id)" class="action-btn-del">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    </div>
   </section>
 </div>

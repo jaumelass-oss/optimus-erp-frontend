@@ -16,4 +16,8 @@ export class ActivoService {
     crearActivo(activo: Activo): Observable<Activo> {
         return this.http.post<Activo>(this.url, activo);
     }
+
+    eliminarActivo(id: number): Observable<void> {
+        return this.http.delete<void>(`${this.url}/${id}`);
+    }
 }

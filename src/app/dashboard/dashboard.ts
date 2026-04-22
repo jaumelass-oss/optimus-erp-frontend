@@ -11,13 +11,15 @@ import { ChangeDetectorRef } from '@angular/core';
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css']
 })
+
 export class DashboardComponent implements OnInit {
   titulo: string = 'Panel de Control - Optimus ERP';
   
   stats = {
     totalValor: 0,
     totalUnidades: 0,
-    alertaStock: 0
+    alertaStock: 0,
+    categorias: [] as any[]
   };
 
   constructor(
@@ -55,6 +57,28 @@ export class DashboardComponent implements OnInit {
     this.stats.totalUnidades = activos.reduce((acc, a) => acc + (Number(a.stock) || 0), 0);
     
     this.stats.alertaStock = activos.filter(a => (Number(a.stock) || 0) < 5).length;
+
+    const grupos = activos.reduce((acc, activo) => {
+      const tipo = activo.tipo || 'General';
+      if (!acc[tipo]) {
+        acc[tipo] = { valor: 0, cantidad: 0 };
+      }
+      acc[tipo].cantidad += (Number(activo.stock) || 0);
+      acc[tipo].valor += (Number(activo.valor) || 0) * (Number(activo.stock) || 0);
+      return acc;
+    }, {} as any);
+
+    this.stats.categorias = Object.keys(grupos).map(tipo => {
+      const valorTipo = grupos[tipo].valor;
+      return {
+        tipo: tipo,
+        cantidad: grupos[tipo].cantidad,
+        valorTotal: valorTipo,
+        porcentaje: this.stats.totalValor > 0 
+          ? Math.round((valorTipo / this.stats.totalValor) * 100) 
+          : 0
+      };
+    });
     
     console.log("Cálculo terminado:", this.stats);
 
