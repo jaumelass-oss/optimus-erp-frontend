@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Activo } from './activo.model';
+import { Activo } from '../models/activo.model';
 
 @Injectable({ providedIn: 'root' })
 export class ActivoService {
@@ -15,6 +15,10 @@ export class ActivoService {
 
     crearActivo(activo: Activo): Observable<Activo> {
         return this.http.post<Activo>(this.url, activo);
+    }
+
+    actualizarActivo(activo: Activo): Observable<Activo> {
+        return this.http.put<Activo>(`${this.url}/${activo.id}`, activo);
     }
 
     eliminarActivo(id: number): Observable<void> {

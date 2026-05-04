@@ -1,0 +1,86 @@
+<div class="pill-notificacion" *ngIf="notificacion">{{ notificacion }}</div>
+
+<header class="content-header">
+  <h1>Clientes</h1>
+  <p>Gestión de clientes para <strong>Principal33</strong></p>
+</header>
+
+<!-- Formulario -->
+<section class="inventory-card mb-4" *ngIf="mostrarFormulario">
+  <h4 class="form-title">{{ modoEdicion ? 'Editar Cliente' : 'Nuevo Cliente' }}</h4>
+  <form (ngSubmit)="guardar()" class="form-flex-row">
+
+    <div class="field-group">
+      <label>Razón Social</label>
+      <input [(ngModel)]="nuevoCliente.razonSocial" name="razonSocial"
+             placeholder="Empresa S.L." class="form-input" required />
+    </div>
+
+    <div class="field-group">
+      <label>CIF / VIES</label>
+      <input [(ngModel)]="nuevoCliente.cifVies" name="cifVies"
+             placeholder="B12345678" class="form-input" required />
+    </div>
+
+    <div class="field-group">
+      <label>País</label>
+      <input [(ngModel)]="nuevoCliente.pais" name="pais"
+             placeholder="España" class="form-input" />
+    </div>
+
+    <div class="field-group">
+      <label>Email Facturación</label>
+      <input [(ngModel)]="nuevoCliente.emailFacturacion" name="emailFacturacion"
+             type="email" placeholder="facturas@empresa.com" class="form-input" />
+    </div>
+
+    <button type="submit" class="btn-submit-action">
+      <i class="fas fa-save"></i> {{ modoEdicion ? 'Actualizar' : 'Guardar' }}
+    </button>
+    <button type="button" class="btn-cancel-action" (click)="toggleFormulario()">
+      Cancelar
+    </button>
+  </form>
+</section>
+
+<!-- Botón abrir formulario -->
+<div class="actions-bar">
+  <button class="btn-submit-action" (click)="toggleFormulario()" *ngIf="!mostrarFormulario">
+    <i class="fas fa-plus"></i> Nuevo Cliente
+  </button>
+</div>
+
+<!-- Tabla -->
+<section class="inventory-card">
+  <table class="tabla-activos" *ngIf="clientes.length > 0; else sinClientes">
+    <thead>
+      <tr>
+        <th>Razón Social</th>
+        <th>CIF / VIES</th>
+        <th>País</th>
+        <th>Email</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let c of clientes">
+        <td><strong>{{ c.razonSocial }}</strong></td>
+        <td><code>{{ c.cifVies }}</code></td>
+        <td>{{ c.pais }}</td>
+        <td>{{ c.emailFacturacion || '—' }}</td>
+        <td class="acciones">
+          <button class="btn-edit" (click)="prepararEdicion(c)">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button class="btn-delete" (click)="eliminar(c.id!)">
+            <i class="fas fa-trash"></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <ng-template #sinClientes>
+    <p class="empty-state">No hay clientes registrados aún.</p>
+  </ng-template>
+</section>

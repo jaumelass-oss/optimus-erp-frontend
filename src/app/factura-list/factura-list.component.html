@@ -1,0 +1,303 @@
+<div class="pill-notificacion" *ngIf="notificacion">{{ notificacion }}</div>
+
+
+<ng-container *ngIf="vista === 'lista'">
+
+  <header class="content-header">
+    <div>
+      <h1>Facturas</h1>
+      <p>Módulo de facturación · <strong>Principal33</strong></p>
+    </div>
+    <button class="btn-primary" (click)="abrirFormularioNuevo()">
+      <i class="fas fa-plus"></i> Nueva Factura
+    </button>
+  </header>
+
+  <div class="filtros-bar">
+    <label class="filtro-label">Filtrar por estado:</label>
+    <div class="filtro-pills">
+      <button [class.active]="filtroEstado === ''"
+              (click)="filtroEstado = ''; aplicarFiltro()" class="pill-btn">
+        Todas
+      </button>
+      <button *ngFor="let e of estados"
+              [class.active]="filtroEstado === e"
+              [class]="'pill-btn ' + badgeClass(e)"
+              (click)="filtroEstado = e; aplicarFiltro()">
+        {{ e }}
+      </button>
+    </div>
+  </div>
+
+  <section class="inventory-card">
+    <table class="tabla-activos" *ngIf="facturas.length > 0; else sinFacturas">
+      <thead>
+        <tr>
+          <th>Nº Factura</th>
+          <th>Cliente</th>
+          <th>Fecha</th>
+          <th>Base</th>
+          <th>Total (IVA inc.)</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let f of facturas">
+          <td><code class="numero-factura">{{ f.numeroFactura }}</code></td>
+          <td><strong>{{ f.clienteRazonSocial }}</strong></td>
+          <td>{{ f.fechaEmision }}</td>
+          <td>{{ f.baseImponible | number:'1.2-2' }} €</td>
+          <td class="total-col">{{ f.totalEur | number:'1.2-2' }} €</td>
+          <td>
+            <span [class]="'badge ' + badgeClass(f.estado)">{{ f.estado }}</span>
+          </td>
+          <td class="acciones">
+            <button class="btn-icon btn-view" title="Ver detalle" (click)="verDetalle(f)">
+              <i class="fas fa-eye"></i>
+            </button>
+            <button class="btn-icon btn-pdf" title="Exportar PDF" (click)="generarPdf(f)">
+              <i class="fas fa-file-pdf"></i>
+            </button>
+            <button class="btn-icon btn-edit" title="Editar"
+                    *ngIf="f.estado === 'BORRADOR'" (click)="abrirEdicion(f)">
+              <i class="fas fa-edit"></i>
+            </button>
+            <!-- Dropdown transiciones de estado -->
+            <ng-container *ngFor="let t of transicionesPosibles(f.estado)">
+              <button [class]="'btn-icon btn-estado-' + t.toLowerCase()"
+                      [title]="'Marcar como ' + t"
+                      (click)="cambiarEstado(f.id, t)">
+                <i class="fas"
+                   [class.fa-paper-plane]="t === 'EMITIDA'"
+                   [class.fa-check-circle]="t === 'PAGADA'"
+                   [class.fa-ban]="t === 'CANCELADA'"></i>
+              </button>
+            </ng-container>
+            <button class="btn-icon btn-delete" title="Eliminar"
+                    *ngIf="f.estado === 'BORRADOR'" (click)="eliminar(f.id)">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #sinFacturas>
+      <div class="empty-state">
+        <i class="fas fa-file-invoice fa-2x"></i>
+        <p>No hay facturas registradas aún.</p>
+        <button class="btn-primary mt-1" (click)="abrirFormularioNuevo()">
+          Crear primera factura
+        </button>
+      </div>
+    </ng-template>
+  </section>
+</ng-container>
+
+
+
+<ng-container *ngIf="vista === 'form'">
+
+  <header class="content-header">
+    <div>
+      <h1>{{ modoEdicion ? 'Editar Factura' : 'Nueva Factura' }}</h1>
+      <p>Completa los datos y añade líneas de detalle</p>
+    </div>
+    <button class="btn-secondary" (click)="volverALista()">
+      <i class="fas fa-arrow-left"></i> Volver
+    </button>
+  </header>
+
+  <form (ngSubmit)="guardar()">
+
+    <section class="inventory-card mb-4">
+      <h4 class="form-title">Datos de la Factura</h4>
+      <div class="form-grid">
+
+        <div class="field-group">
+          <label>Cliente *</label>
+          <select [(ngModel)]="nuevaFactura.clienteId" name="clienteId"
+                  class="form-input" required>
+            <option [value]="0" disabled>Seleccionar cliente...</option>
+            <option *ngFor="let c of clientes" [value]="c.id">
+              {{ c.razonSocial }} — {{ c.cifVies }}
+            </option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label>Fecha de Emisión *</label>
+          <input [(ngModel)]="nuevaFactura.fechaEmision" name="fechaEmision"
+                 type="date" class="form-input" required />
+        </div>
+
+        <div class="field-group">
+          <label>IVA (%)</label>
+          <input [(ngModel)]="nuevaFactura.ivaPorcentaje" name="iva"
+                 type="number" min="0" max="100" class="form-input" />
+        </div>
+
+      </div>
+    </section>
+
+    <section class="inventory-card mb-4">
+      <div class="lineas-header">
+        <h4 class="form-title">Líneas de Factura</h4>
+        <button type="button" class="btn-add-linea" (click)="agregarLinea()">
+          <i class="fas fa-plus"></i> Añadir línea
+        </button>
+      </div>
+
+      <div class="lineas-container">
+        <div *ngIf="nuevaFactura.lineas.length === 0" class="empty-lineas">
+          Añade al menos una línea para poder guardar.
+        </div>
+
+        <div class="linea-row" *ngFor="let linea of nuevaFactura.lineas; let i = index">
+          <div class="linea-num">{{ i + 1 }}</div>
+
+          <div class="field-group flex-3">
+            <label>Descripción *</label>
+            <input [(ngModel)]="linea.descripcion" [name]="'desc_' + i"
+                   (ngModelChange)="actualizarPrecioDescripcion(linea)"
+                   list="serviciosInventario"
+                   placeholder="Servicio o producto" class="form-input" required />
+          </div>
+
+          <div class="field-group flex-1">
+            <label>Cantidad</label>
+            <input [(ngModel)]="linea.cantidad" [name]="'qty_' + i"
+                   type="number" min="1" class="form-input" />
+          </div>
+
+          <div class="field-group flex-2">
+            <label>Precio Unitario (€)</label>
+            <input [(ngModel)]="linea.precioUnitario" [name]="'precio_' + i"
+                   type="number" min="0" step="0.01" class="form-input" />
+          </div>
+
+          <div class="field-group flex-2">
+            <label>Subtotal</label>
+            <div class="subtotal-display">{{ calcularSubtotalLinea(linea) | number:'1.2-2' }} €</div>
+          </div>
+
+          <button type="button" class="btn-remove-linea"
+                  (click)="eliminarLinea(i)" title="Eliminar línea">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+
+      <datalist id="serviciosInventario">
+        <option *ngFor="let servicio of serviciosInventario" [value]="servicio"></option>
+      </datalist>
+      <div class="totales-box" *ngIf="nuevaFactura.lineas.length > 0">
+        <div class="total-row">
+          <span>Base Imponible</span>
+          <span>{{ calcularBaseImponible() | number:'1.2-2' }} €</span>
+        </div>
+        <div class="total-row">
+          <span>IVA ({{ nuevaFactura.ivaPorcentaje }}%)</span>
+          <span>{{ (calcularBaseImponible() * nuevaFactura.ivaPorcentaje / 100) | number:'1.2-2' }} €</span>
+        </div>
+        <div class="total-row total-final">
+          <span>TOTAL</span>
+          <span>{{ calcularTotalConIva() | number:'1.2-2' }} €</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Botones -->
+    <div class="form-actions">
+      <button type="submit" class="btn-primary"
+              [disabled]="!nuevaFactura.clienteId || nuevaFactura.lineas.length === 0">
+        <i class="fas fa-save"></i> {{ modoEdicion ? 'Actualizar Factura' : 'Crear Factura' }}
+      </button>
+      <button type="button" class="btn-secondary" (click)="generarPdf(nuevaFactura)"
+              [disabled]="!nuevaFactura.clienteId || nuevaFactura.lineas.length === 0">
+        <i class="fas fa-file-pdf"></i> Exportar PDF
+      </button>
+      <button type="button" class="btn-secondary" (click)="volverALista()">Cancelar</button>
+    </div>
+
+  </form>
+</ng-container>
+
+
+
+<ng-container *ngIf="vista === 'detalle' && facturaDetalle">
+
+  <header class="content-header">
+    <div>
+      <h1>{{ facturaDetalle.numeroFactura }}</h1>
+      <span [class]="'badge ' + badgeClass(facturaDetalle.estado)">
+        {{ facturaDetalle.estado }}
+      </span>
+    </div>
+    <div class="detalle-actions">
+      <button class="btn-secondary" (click)="generarPdf(facturaDetalle)">
+        <i class="fas fa-file-pdf"></i> Descargar PDF
+      </button>
+      <button class="btn-secondary" (click)="volverALista()">
+        <i class="fas fa-arrow-left"></i> Volver
+      </button>
+    </div>
+  </header>
+
+  <section class="inventory-card mb-4">
+    <div class="detalle-grid">
+      <div class="detalle-item">
+        <label>Cliente</label>
+        <span>{{ facturaDetalle.clienteRazonSocial }}</span>
+      </div>
+      <div class="detalle-item">
+        <label>Fecha Emisión</label>
+        <span>{{ facturaDetalle.fechaEmision }}</span>
+      </div>
+      <div class="detalle-item">
+        <label>Base Imponible</label>
+        <span>{{ facturaDetalle.baseImponible | number:'1.2-2' }} €</span>
+      </div>
+      <div class="detalle-item">
+        <label>IVA ({{ facturaDetalle.ivaPorcentaje }}%)</label>
+        <span>{{ (facturaDetalle.baseImponible * facturaDetalle.ivaPorcentaje / 100) | number:'1.2-2' }} €</span>
+      </div>
+      <div class="detalle-item">
+        <label>Email empresa</label>
+        <span>{{ empresaEmail }}</span>
+      </div>
+      <div class="detalle-item total-item">
+        <label>TOTAL</label>
+        <span>{{ facturaDetalle.totalEur | number:'1.2-2' }} €</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="inventory-card">
+    <h4 class="form-title">Líneas</h4>
+    <table class="tabla-activos">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Descripción</th>
+          <th>Cantidad</th>
+          <th>Precio Unit.</th>
+          <th>Subtotal</th>
+          <th>Activo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let l of facturaDetalle.lineas; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ l.descripcion }}</td>
+          <td>{{ l.cantidad }}</td>
+          <td>{{ l.precioUnitario | number:'1.2-2' }} €</td>
+          <td><strong>{{ l.subtotal | number:'1.2-2' }} €</strong></td>
+          <td>{{ l.activoNombre || '—' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+</ng-container>

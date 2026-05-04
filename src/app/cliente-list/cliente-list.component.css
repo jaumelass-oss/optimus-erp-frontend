@@ -1,0 +1,128 @@
+.pill-notificacion {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #22c55e, #4ade80);
+  color: #ffffff;
+  padding: 10px 28px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  z-index: 9999;
+  box-shadow: 0 4px 20px rgba(34, 197, 94, 0.25);
+  animation: slideDown .3s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateX(-50%) translateY(-16px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.content-header { margin-bottom: 1.5rem; }
+.content-header h1 { font-size: 1.8rem; font-weight: 700; margin: 0; color: #0f172a; }
+.content-header p  { margin: .25rem 0 0; opacity: .65; color: #475569; }
+
+.mb-4 { margin-bottom: 1.5rem; }
+
+.inventory-card {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+.form-title { margin: 0 0 1rem; font-size: 1rem; opacity: .8; font-weight: 600; color: #0f172a; }
+
+.form-flex-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+  align-items: flex-end;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: .35rem;
+  flex: 1;
+  min-width: 160px;
+}
+
+.field-group label { font-size: .78rem; font-weight: 600; opacity: .7; color: #475569; }
+
+.form-input {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 10px;
+  padding: .55rem .9rem;
+  color: #0f172a;
+  font-size: .9rem;
+  transition: border-color .2s;
+  outline: none;
+}
+.form-input:focus { border-color: #3b82f6; }
+
+.btn-submit-action {
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: .6rem 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+  white-space: nowrap;
+}
+.btn-submit-action:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(59, 130, 246, 0.3); }
+
+.btn-cancel-action {
+  background: #f8fafc;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 10px;
+  padding: .6rem 1rem;
+  color: #0f172a;
+  cursor: pointer;
+  opacity: .9;
+  transition: opacity .2s;
+}
+.btn-cancel-action:hover { opacity: 1; }
+
+.actions-bar { margin-bottom: 1rem; }
+
+.tabla-activos {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .9rem;
+}
+.tabla-activos th {
+  text-align: left;
+  padding: .6rem .8rem;
+  font-size: .78rem;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  opacity: .65;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+.tabla-activos td {
+  padding: .75rem .8rem;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+.tabla-activos tr:last-child td { border-bottom: none; }
+.tabla-activos tbody tr:hover { background: rgba(59, 130, 246, 0.06); }
+
+.acciones { display: flex; gap: .5rem; }
+
+.btn-edit, .btn-delete {
+  border: none;
+  border-radius: 8px;
+  padding: .4rem .7rem;
+  cursor: pointer;
+  font-size: .85rem;
+  transition: transform .15s;
+}
+.btn-edit   { background: rgba(59,130,246,.15); color: #2563eb; }
+.btn-delete { background: rgba(239,68,68,.12);  color: #b91c1c; }
+.btn-edit:hover, .btn-delete:hover { transform: scale(1.1); }
+
+.empty-state { text-align: center; opacity: .6; padding: 2rem 0; }

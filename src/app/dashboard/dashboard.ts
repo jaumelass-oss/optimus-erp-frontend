@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivoService } from '../activo.service';
-import { Activo } from '../activo.model';
+import { ActivoService } from '../services/activo.service';
+import { Activo } from '../models/activo.model';
 import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
