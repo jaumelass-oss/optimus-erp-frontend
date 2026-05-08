@@ -1,0 +1,122 @@
+<div class="pill-notificacion" *ngIf="notificacion">{{ notificacion }}</div>
+
+<header class="content-header">
+  <div>
+    <h1>Empleados</h1>
+    <p>Gestión de personal · <strong>Principal33</strong></p>
+  </div>
+  <button class="btn-primary" (click)="mostrarFormulario = true" *ngIf="!mostrarFormulario">
+    <i class="fas fa-user-plus"></i> Nuevo Empleado
+  </button>
+</header>
+
+<section class="inventory-card mb-4" *ngIf="mostrarFormulario">
+  <h4 class="form-title">{{ modoEdicion ? 'Editar Empleado' : 'Nuevo Empleado' }}</h4>
+  <form (ngSubmit)="guardar()" class="form-grid">
+
+    <div class="field-group">
+      <label>Nombre *</label>
+      <input [(ngModel)]="nuevoEmpleado.nombre" name="nombre"
+             placeholder="Ana" class="form-input" required />
+    </div>
+
+    <div class="field-group">
+      <label>Apellidos *</label>
+      <input [(ngModel)]="nuevoEmpleado.apellidos" name="apellidos"
+             placeholder="García López" class="form-input" required />
+    </div>
+
+    <div class="field-group">
+      <label>Email Corporativo</label>
+      <input [(ngModel)]="nuevoEmpleado.emailCorporativo" name="email"
+             type="email" placeholder="ana@principal33.com" class="form-input" />
+    </div>
+
+    <div class="field-group">
+      <label>Departamento</label>
+      <select [(ngModel)]="nuevoEmpleado.departamentoId" name="departamento" class="form-input">
+        <option [ngValue]="null">Sin departamento</option>
+        <option *ngFor="let d of departamentos" [value]="d.id">
+          {{ d.nombre }} ({{ d.sede }})
+        </option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label>Tarifa / Hora (€)</label>
+      <input [(ngModel)]="nuevoEmpleado.tarifaHora" name="tarifa"
+             type="number" min="0" step="0.01" class="form-input" />
+    </div>
+
+    <div class="form-actions-inline">
+      <button type="submit" class="btn-primary">
+        <i class="fas fa-save"></i> {{ modoEdicion ? 'Actualizar' : 'Guardar' }}
+      </button>
+      <button type="button" class="btn-secondary" (click)="resetFormulario()">
+        Cancelar
+      </button>
+    </div>
+
+  </form>
+</section>
+
+<div class="filtros-bar">
+  <div class="search-box">
+    <i class="fas fa-search"></i>
+    <input [(ngModel)]="filtroBuscar" placeholder="Buscar por nombre..."
+           class="search-input" (keyup.enter)="aplicarFiltros()" />
+  </div>
+
+  <select [(ngModel)]="filtroDepartamento" class="form-input filter-select"
+          (change)="aplicarFiltros()">
+    <option value="">Todos los departamentos</option>
+    <option *ngFor="let d of departamentos" [value]="d.id">{{ d.nombre }}</option>
+  </select>
+
+  <button class="btn-secondary btn-sm" (click)="aplicarFiltros()">
+    <i class="fas fa-filter"></i> Filtrar
+  </button>
+  <button class="btn-ghost btn-sm" (click)="limpiarFiltros()" *ngIf="filtroBuscar || filtroDepartamento">
+    <i class="fas fa-times"></i> Limpiar
+  </button>
+</div>
+
+<div class="empleados-grid" *ngIf="empleados.length > 0; else sinEmpleados">
+  <div class="empleado-card" *ngFor="let e of empleados">
+
+    <div class="empleado-avatar">{{ inicialesEmpleado(e) }}</div>
+
+    <div class="empleado-info">
+      <h3>{{ e.nombreCompleto }}</h3>
+      <p class="empleado-email">
+        <i class="fas fa-envelope"></i>
+        {{ e.emailCorporativo || 'Sin email' }}
+      </p>
+      <div class="empleado-meta">
+        <span class="tag-dept" *ngIf="e.departamentoNombre">
+          <i class="fas fa-building"></i> {{ e.departamentoNombre }}
+        </span>
+        <span class="tag-tarifa" *ngIf="e.tarifaHora">
+          <i class="fas fa-clock"></i> {{ e.tarifaHora | number:'1.2-2' }} €/h
+        </span>
+      </div>
+    </div>
+
+    <div class="empleado-acciones">
+      <button class="btn-icon btn-edit" (click)="prepararEdicion(e)" title="Editar">
+        <i class="fas fa-edit"></i>
+      </button>
+      <button class="btn-icon btn-delete" (click)="eliminar(e.id!)" title="Eliminar">
+        <i class="fas fa-trash"></i>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<ng-template #sinEmpleados>
+  <div class="empty-state">
+    <i class="fas fa-users fa-2x"></i>
+    <p>No hay empleados registrados aún.</p>
+  </div>
+</ng-template>
