@@ -1,54 +1,159 @@
 <div class="dashboard-wrapper">
-  <h2 class="section-title">Resumen de Inventario</h2>
-  
+
+  <!-- ══════════════════════════════════════════
+       SECCIÓN 1 · INVENTARIO
+  ══════════════════════════════════════════ -->
+  <div class="section-header">
+    <h2 class="section-title">Resumen de inventario</h2>
+  </div>
+
   <div class="stats-grid">
+    <!-- Valor total -->
     <div class="stat-card">
       <div class="stat-icon icon-blue">
-        <i class="fas fa-dollar-sign"></i> 
+        <i class="fas fa-euro-sign"></i>
       </div>
       <div class="stat-info">
-        <span class="stat-label">Valor Total Inventario</span>
-        <div class="stat-value">{{ stats.totalValor | currency:'EUR' }}</div>
+        <span class="stat-label">Valor total inventario</span>
+        <div class="stat-value">{{ stats.totalValor | currency:'EUR':'symbol':'1.0-0' }}</div>
       </div>
     </div>
 
+    <!-- Stock total -->
     <div class="stat-card">
       <div class="stat-icon icon-green">
         <i class="fas fa-boxes"></i>
       </div>
       <div class="stat-info">
-        <span class="stat-label">Stock Total</span>
-        <div class="stat-value">{{ stats.totalUnidades }} uds</div>
+        <span class="stat-label">Stock total</span>
+        <div class="stat-value">{{ stats.totalUnidades }} <span class="stat-unit">uds</span></div>
       </div>
     </div>
 
+    <!-- Alertas -->
     <div class="stat-card">
       <div class="stat-icon icon-red">
         <i class="fas fa-exclamation-triangle"></i>
       </div>
       <div class="stat-info">
-        <span class="stat-label">Alertas de Stock</span>
-        <div class="stat-value">{{ stats.alertaStock }}</div>
+        <span class="stat-label">Alertas de stock</span>
+        <div class="stat-value" [class.valor-alerta]="stats.alertaStock > 0">
+          {{ stats.alertaStock }}
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="distribution-section">
-    <h3 class="subsection-title">Distribución por Categoría</h3>
-    <div class="category-list">
+  <!-- Distribución por categoría -->
+  <div class="card mb-section" *ngIf="stats.categorias.length > 0">
+    <div class="card-header">
+      <h3 class="card-title">Distribución por categoría</h3>
+    </div>
+    <div class="category-grid">
       <div class="category-item" *ngFor="let cat of stats.categorias">
         <div class="category-info">
           <span class="cat-name">{{ cat.tipo }}</span>
           <span class="cat-percentage">{{ cat.porcentaje }}%</span>
         </div>
-        <div class="progress-bar-bg">
-          <div class="progress-bar-fill" [style.width.%]="cat.porcentaje"></div>
+        <div class="progress-bg">
+          <div class="progress-fill" [style.width.%]="cat.porcentaje"></div>
         </div>
         <div class="cat-footer">
           <span>{{ cat.cantidad }} activos</span>
-          <span>{{ cat.valorTotal | currency:'EUR' }}</span>
+          <span>{{ cat.valorTotal | currency:'EUR':'symbol':'1.0-0' }}</span>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- ══════════════════════════════════════════
+       SECCIÓN 2 · FACTURACIÓN
+  ══════════════════════════════════════════ -->
+  <div class="section-header">
+    <h2 class="section-title">Facturación mensual</h2>
+    <p class="section-sub">Comparativa 2025 vs 2024</p>
+  </div>
+
+  <!-- Skeleton loader -->
+  <div class="card" *ngIf="cargandoFacturas">
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <span>Cargando datos de facturación...</span>
+    </div>
+  </div>
+
+  <ng-container *ngIf="!cargandoFacturas">
+
+    <!-- Métricas de facturación -->
+    <div class="facts-grid mb-section">
+
+      <div class="fact-card fact-card--blue" *ngIf="vista !== 'compras'">
+        <div class="fact-icon"><i class="fas fa-chart-line"></i></div>
+        <div>
+          <p class="fact-label">Ventas 2025 (acum.)</p>
+          <p class="fact-value">{{ fmt(totalVentas2025) }}</p>
+          <p class="fact-var" [class.pos]="varVentas >= 0" [class.neg]="varVentas < 0">
+            {{ varVentas >= 0 ? '▲' : '▼' }} {{ varVentas }}% vs 2024
+          </p>
+        </div>
+      </div>
+
+      <div class="fact-card" *ngIf="vista !== 'compras'">
+        <div class="fact-icon fact-icon--muted"><i class="fas fa-clock-rotate-left"></i></div>
+        <div>
+          <p class="fact-label">Ventas 2024 (total)</p>
+          <p class="fact-value">{{ fmt(totalVentas2024) }}</p>
+        </div>
+      </div>
+
+      <div class="fact-card fact-card--amber" *ngIf="vista !== 'ventas'">
+        <div class="fact-icon fact-icon--amber"><i class="fas fa-cart-shopping"></i></div>
+        <div>
+          <p class="fact-label">Compras 2025 (acum.)</p>
+          <p class="fact-value">{{ fmt(totalCompras2025) }}</p>
+          <p class="fact-var" [class.pos]="varCompras <= 0" [class.neg]="varCompras > 0">
+            {{ varCompras > 0 ? '▲' : '▼' }} {{ varCompras }}% vs 2024
+          </p>
+        </div>
+      </div>
+
+      <div class="fact-card" *ngIf="vista !== 'ventas'">
+        <div class="fact-icon fact-icon--muted"><i class="fas fa-clock-rotate-left"></i></div>
+        <div>
+          <p class="fact-label">Compras 2024 (total)</p>
+          <p class="fact-value">{{ fmt(totalCompras2024) }}</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Card de la gráfica -->
+    <div class="card">
+      <div class="chart-header">
+        <!-- Leyenda -->
+        <div class="leyenda">
+          <span class="leyenda-item" *ngFor="let item of legendItems()">
+            <span class="leyenda-dot" [style.background]="item.color"></span>
+            {{ item.label }}
+          </span>
+        </div>
+        <!-- Toggle de vista -->
+        <div class="vista-toggle">
+          <button [class.active]="vista === 'ambos'"   (click)="cambiarVista('ambos')">Todo</button>
+          <button [class.active]="vista === 'ventas'"  (click)="cambiarVista('ventas')">Ventas</button>
+          <button [class.active]="vista === 'compras'" (click)="cambiarVista('compras')">Compras</button>
+        </div>
+      </div>
+
+      <div class="canvas-wrap">
+        <canvas #chartCanvas
+          role="img"
+          aria-label="Gráfica de barras agrupadas de ventas y compras 2025 vs 2024">
+          Datos de facturación mensual comparativos 2025 vs 2024.
+        </canvas>
+      </div>
+    </div>
+
+  </ng-container>
+
 </div>
