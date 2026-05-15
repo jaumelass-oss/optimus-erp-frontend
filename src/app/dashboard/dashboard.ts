@@ -14,7 +14,7 @@ type Vista = 'ambos' | 'ventas' | 'compras';
 })
 export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
-  @ViewChild('chartCanvas', { static: false }) canvasRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('vegaChart', { static: false }) chartDiv!: ElementRef<HTMLDivElement>;
 
   // ── Inventario ──
   stats = {
@@ -26,7 +26,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // ── Facturación ──
   cargandoFacturas = true;
-  meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   vista: Vista = 'ambos';
 
   totalVentas2025  = 0;
@@ -58,7 +58,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     if (!this.cargandoFacturas) {
-      this.dibujarGrafica();
+      this.renderVega();
     }
   }
 
@@ -121,10 +121,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cargandoFacturas = false;
     this.cdr.detectChanges();
 
-    setTimeout(() => this.dibujarGrafica(), 50);
+    setTimeout(() => this.renderVega(), 50);
   }
 
-  // ── GRÁFICA CANVAS NATIVO ───────────────────────────────────────────────────
+  // ── GRÁFICA (Vega-Lite) ───────────────────────────────────────────────────
 
   private getDatasets(): { label: string; data: number[]; color: string }[] {
     const all = [
@@ -138,97 +138,107 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     return all;
   }
 
-  dibujarGrafica(): void {
-    const canvas = this.canvasRef?.nativeElement;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const dpr = window.devicePixelRatio || 1;
-    const W   = canvas.offsetWidth  || 800;
-    const H   = canvas.offsetHeight || 320;
-    canvas.width  = W * dpr;
-    canvas.height = H * dpr;
-    ctx.scale(dpr, dpr);
-
-    ctx.clearRect(0, 0, W, H);
+  async renderVega(): Promise<void> {
+    const container = this.chartDiv?.nativeElement;
+    if (!container) return;
 
     const datasets = this.getDatasets();
-    const nSeries  = datasets.length;
-    const nMeses   = 12;
 
-    const padL = 60, padR = 16, padT = 16, padB = 36;
-    const chartW = W - padL - padR;
-    const chartH = H - padT - padB;
-
-    const allVals = datasets.flatMap(d => d.data);
-    const maxVal  = Math.max(...allVals, 1);
-
-    // Líneas de guía horizontales
-    const nLines = 5;
-    ctx.strokeStyle = 'rgba(15,23,42,0.06)';
-    ctx.lineWidth   = 1;
-    ctx.fillStyle   = '#94a3b8';
-    ctx.font        = '11px system-ui, sans-serif';
-    ctx.textAlign   = 'right';
-
-    for (let i = 0; i <= nLines; i++) {
-      const v = (maxVal / nLines) * i;
-      const y = padT + chartH - (chartH * i / nLines);
-      ctx.beginPath();
-      ctx.moveTo(padL, y);
-      ctx.lineTo(W - padR, y);
-      ctx.stroke();
-      ctx.fillText(this.fmtCompact(v), padL - 6, y + 4);
+    // Convertir a formato "long" para Vega-Lite
+    const values: { mes: string; serie: string; valor: number }[] = [];
+    for (let m = 0; m < 12; m++) {
+      const mes = this.meses[m];
+      for (const ds of datasets) {
+        values.push({ mes, serie: ds.label, valor: ds.data[m] || 0 });
+      }
     }
 
-    // Barras con gradiente
-    const groupW = chartW / nMeses;
-    const barGap = 2;
-    const barW   = Math.max(2, (groupW - barGap * (nSeries + 1)) / nSeries);
-
-    for (let m = 0; m < nMeses; m++) {
-      const groupX = padL + m * groupW;
-
-      for (let s = 0; s < nSeries; s++) {
-        const val  = datasets[s].data[m] || 0;
-        const barH = val > 0 ? Math.max(2, (val / maxVal) * chartH) : 0;
-        const x    = groupX + barGap + s * (barW + barGap);
-        const y    = padT + chartH - barH;
-
-        // Gradiente principal
-        const grad = ctx.createLinearGradient(x, y, x, y + barH);
-        grad.addColorStop(0, datasets[s].color);
-        grad.addColorStop(1, datasets[s].color + '55');
-        ctx.fillStyle = grad;
-        ctx.beginPath();
-        ctx.roundRect(x, y, barW, barH, [6, 6, 0, 0]);
-        ctx.fill();
-
-        // Brillo superior
-        if (barH > 10) {
-          const shine = ctx.createLinearGradient(x, y, x, y + barH * 0.3);
-          shine.addColorStop(0, 'rgba(255,255,255,0.25)');
-          shine.addColorStop(1, 'rgba(255,255,255,0)');
-          ctx.fillStyle = shine;
-          ctx.beginPath();
-          ctx.roundRect(x, y, barW, barH * 0.3, [6, 6, 0, 0]);
-          ctx.fill();
+    const spec: any = {
+      $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+      description: 'Facturación 2025 vs 2024',
+      width: 'container',
+      height: 340,
+      autosize: { type: 'fit', contains: 'padding', resize: true },
+      padding: { top: 20, left: 26, right: 10, bottom: 48 },
+      data: { values },
+      mark: { type: 'bar', cornerRadiusEnd: 6 },
+      encoding: {
+        x: {
+          field: 'mes',
+          type: 'ordinal',
+          sort: { domain: this.meses },
+          axis: {
+            labelAngle: -35,
+            labelAlign: 'right',
+            labelFontSize: 12,
+            labelFont: 'Poppins, system-ui, sans-serif',
+            labelLimit: 100,
+            labelOverlap: 'parity',
+            title: 'Mes',
+            titleFontSize: 12,
+            titleFont: 'Poppins, system-ui, sans-serif',
+            titlePadding: 8
+          }
+        },
+        y: {
+          field: 'valor',
+          type: 'quantitative',
+          axis: {
+            format: 's',
+            labelFontSize: 12,
+            labelFont: 'Poppins, system-ui, sans-serif',
+            title: 'valor',
+            titleFontSize: 12,
+            titleFont: 'Poppins, system-ui, sans-serif',
+            titlePadding: 8
+          }
+        },
+        color: {
+          field: 'serie',
+          type: 'nominal',
+          scale: {
+            domain: datasets.map(d => d.label),
+            range: datasets.map(d => d.color)
+          },
+          legend: {
+            orient: 'top',
+            labelFontSize: 12,
+            labelFont: 'Poppins, system-ui, sans-serif',
+            title: null,
+            symbolType: 'square',
+            symbolSize: 80,
+            padding: 8
+          }
+        },
+        xOffset: { field: 'serie' }
+      },
+      config: {
+        view: { stroke: 'transparent' },
+        axis: {
+          domainColor: '#cbd5e1',
+          gridColor: '#e2e8f0',
+          grid: true,
+          tickColor: '#94a3b8',
+          labelColor: '#475569',
+          titleColor: '#334155'
         }
       }
+    };
 
-      // Label mes
-      ctx.fillStyle = '#94a3b8';
-      ctx.textAlign = 'center';
-      ctx.font      = '11px system-ui, sans-serif';
-      ctx.fillText(this.meses[m], groupX + groupW / 2, H - padB + 16);
+    try {
+      const embedModule: any = await import('vega-embed');
+      const vegaEmbed = embedModule.default || embedModule;
+      // limpiar contenedor y renderizar
+      container.innerHTML = '';
+      await vegaEmbed(container, spec, { actions: false, renderer: 'svg' });
+    } catch (err) {
+      console.error('Error cargando vega-embed:', err);
     }
-  } // ← cierra dibujarGrafica()
+  }
 
   cambiarVista(v: Vista): void {
     this.vista = v;
-    setTimeout(() => this.dibujarGrafica(), 0);
+    setTimeout(() => this.renderVega(), 0);
   }
 
   legendItems(): { label: string; color: string }[] {

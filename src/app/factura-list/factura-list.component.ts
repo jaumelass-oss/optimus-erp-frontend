@@ -149,7 +149,7 @@ export class FacturaListComponent implements OnInit {
 
     const activo = this.activos.find(a => a.nombre.trim().toLowerCase() === descripcion);
     if (activo) {
-      linea.precioUnitario = activo.valor;
+      linea.precioUnitario = activo.valor ?? 0;
       linea.activoId = activo.id ?? null;
     } else {
       linea.activoId = null;
@@ -205,7 +205,7 @@ export class FacturaListComponent implements OnInit {
 
         const actualizado: Activo = {
           ...activo,
-          stock: Math.max(0, activo.stock - linea.cantidad)
+          stock: Math.max(0, (activo.stock ?? 0) - linea.cantidad)
         };
 
         return this.activoService.actualizarActivo(actualizado).pipe(

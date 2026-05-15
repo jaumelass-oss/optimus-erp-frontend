@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --proxy-config proxy.conf.json",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
@@ -22,7 +22,10 @@
     "lucide-angular": "^1.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
-    "zone.js": "^0.16.1"
+    "zone.js": "^0.16.1",
+    "vega": "^5.24.0",
+    "vega-lite": "^5.8.0",
+    "vega-embed": "^6.20.2"
   },
   "devDependencies": {
     "@angular/build": "^21.2.5",

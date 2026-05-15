@@ -291,11 +291,13 @@
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1);
 }
 
-.canvas-wrap canvas {
+.canvas-wrap canvas,
+.canvas-wrap > div {
   position: relative;
   width: 100%;
-  height: clamp(220px, 35vh, 350px);
-  padding: 1.25rem 1.5rem 0.75rem;
+  height: clamp(260px, 36vh, 420px);
+  padding: 0;
+  box-sizing: border-box;
 }
 
 .loading-state {

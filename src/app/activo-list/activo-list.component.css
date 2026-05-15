@@ -1,9 +1,52 @@
-/* Formulario de Registro */
+/* ── Notificación ────────────────────────────────── */
+.pill-notificacion {
+  position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+  background: linear-gradient(135deg, #22c55e, #4ade80); color: #fff;
+  padding: 10px 28px; border-radius: 50px; font-weight: 600; font-size: .9rem;
+  z-index: 9999; box-shadow: 0 4px 20px rgba(34,197,94,.25);
+  animation: slideDown .3s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateX(-50%) translateY(-16px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* ── Cabecera ────────────────────────────────────── */
+.content-header { margin-bottom: 1.5rem; }
+.content-header h1 { font-size: 1.8rem; font-weight: 700; margin: 0; color: #0f172a; }
+.content-header p  { margin: .25rem 0 0; color: #475569; }
+
+.detalle-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+.detalle-header-actions { display: flex; gap: .75rem; }
+
+.mb-4 { margin-bottom: 1.5rem; }
+
+/* ── Cards ───────────────────────────────────────── */
+.inventory-card {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-title {
+  font-size: .9rem; font-weight: 700; color: #34495e;
+  text-transform: uppercase; margin: 0 0 1rem; letter-spacing: .04em;
+}
+
+.form-subtitle {
+  font-size: .8rem; font-weight: 700; color: #64748b;
+  text-transform: uppercase; margin: 1.25rem 0 .75rem; letter-spacing: .04em;
+  border-top: 1px solid #f1f5f9; padding-top: 1rem;
+}
+
+/* ── Formulario ──────────────────────────────────── */
 .form-flex-row {
   display: flex;
   gap: 15px;
   align-items: flex-end;
-  margin-top: 15px;
+  flex-wrap: wrap;
 }
 
 .field-group {
@@ -11,7 +54,10 @@
   flex-direction: column;
   gap: 5px;
   flex: 1;
+  min-width: 120px;
 }
+
+.field-group.flex-3 { flex: 3; }
 
 .field-group label {
   font-size: 0.75rem;
@@ -26,8 +72,18 @@
   border: 1px solid #dcdfe3;
   border-radius: 4px;
   color: #2c3e50;
+  font-size: .9rem;
+  outline: none;
+  transition: border-color .2s;
+  width: 100%;
+  box-sizing: border-box;
+  background: #fff;
 }
+.form-input:focus { border-color: #3498db; }
 
+.form-venta { margin-top: 1rem; }
+
+/* ── Botones ─────────────────────────────────────── */
 .btn-submit-action {
   height: 40px;
   background-color: #3498db;
@@ -37,33 +93,64 @@
   border-radius: 4px;
   font-weight: 600;
   cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  transition: background .2s;
 }
+.btn-submit-action:hover { background-color: #2980b9; }
 
-/* Diseño de Lista (Sin tablas) */
+.btn-cancel-action {
+  height: 40px;
+  background: #f8fafc;
+  border: 1px solid #dcdfe3;
+  color: #2c3e50;
+  padding: 0 16px;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  transition: background .2s;
+}
+.btn-cancel-action:hover { background: #e2e8f0; }
+
+/* ── Lista ───────────────────────────────────────── */
 .list-wrapper {
   background: #ffffff;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border: 1px solid rgba(15, 23, 42, 0.08);
 }
 
 .list-head {
   display: grid;
-  grid-template-columns: 2fr 1.5fr 1fr 1fr 0.5fr;
+  grid-template-columns: 2fr 1.2fr 0.8fr 0.6fr 0.8fr 1fr 0.6fr;
   padding: 15px 20px;
   background: #f8f9fa;
   border-bottom: 2px solid #f4f7f6;
   font-weight: 700;
   color: #2c3e50;
   font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
 }
 
 .list-row {
   display: grid;
-  grid-template-columns: 2fr 1.5fr 1fr 1fr 0.5fr;
-  padding: 15px 20px;
+  grid-template-columns: 2fr 1.2fr 0.8fr 0.6fr 0.8fr 1fr 0.6fr;
+  padding: 14px 20px;
   border-bottom: 1px solid #f4f7f6;
   align-items: center;
+  transition: background .15s;
 }
+.list-row:last-child { border-bottom: none; }
+.list-row:hover { background: rgba(52,152,219,.04); }
+
+.main-text { font-weight: 600; color: #2c3e50; }
 
 .type-tag {
   font-size: 0.65rem;
@@ -72,12 +159,61 @@
   padding: 2px 6px;
   border-radius: 3px;
   margin-left: 8px;
+  font-weight: 600;
 }
 
-.action-btn-del {
+.type-tag-lg {
+  display: inline-block;
+  background: rgba(52,152,219,.12);
+  color: #2980b9;
+  border: 1px solid rgba(52,152,219,.25);
+  padding: 3px 12px;
+  border-radius: 50px;
+  font-size: .8rem;
+  font-weight: 600;
+  margin-top: .3rem;
+}
+
+.col-actions { display: flex; gap: .4rem; align-items: center; }
+
+.action-btn-view, .action-btn-edit, .action-btn-del {
   background: none;
   border: none;
-  color: #e74c3c;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: .95rem;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: background .15s;
 }
+.action-btn-view { color: #3498db; }
+.action-btn-view:hover { background: rgba(52,152,219,.1); }
+.action-btn-edit { color: #f39c12; }
+.action-btn-edit:hover { background: rgba(243,156,18,.1); }
+.action-btn-del  { color: #e74c3c; }
+.action-btn-del:hover  { background: rgba(231,76,60,.1); }
+
+.empty-row {
+  padding: 2.5rem;
+  text-align: center;
+  color: #94a3b8;
+  font-size: .9rem;
+}
+
+/* ── Vista Detalle ───────────────────────────────── */
+.detalle-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1.5rem;
+}
+
+.detalle-item { display: flex; flex-direction: column; gap: .3rem; }
+.detalle-item--full { grid-column: 1 / -1; }
+
+.detalle-label {
+  font-size: .72rem; font-weight: 700; color: #94a3b8;
+  text-transform: uppercase; letter-spacing: .07em;
+}
+
+.detalle-value { font-size: .95rem; font-weight: 600; color: #2c3e50; }
+
+.highlight-blue { color: #2980b9; font-size: 1.05rem; }

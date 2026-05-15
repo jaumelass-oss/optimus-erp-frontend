@@ -146,11 +146,10 @@
       </div>
 
       <div class="canvas-wrap">
-        <canvas #chartCanvas
-          role="img"
-          aria-label="Gráfica de barras agrupadas de ventas y compras 2025 vs 2024">
-          Datos de facturación mensual comparativos 2025 vs 2024.
-        </canvas>
+        <div #vegaChart
+             role="img"
+             aria-label="Gráfica de barras agrupadas de ventas y compras 2025 vs 2024"
+             style="width:100%;height:clamp(220px,35vh,350px);"></div>
       </div>
     </div>
 

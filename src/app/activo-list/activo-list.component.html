@@ -1,58 +1,228 @@
-<div class="inventory-page">
-  <header class="content-header">
-    <h1>Operaciones de Inventario</h1>
-    <p>Gestión y control de activos para <strong>Principal33</strong></p>
-  </header>
+<div class="pill-notificacion" *ngIf="notificacion">{{ notificacion }}</div>
 
-  <section class="inventory-card mb-4">
-    <h4 class="form-title">Registrar Nuevo Activo</h4>
-    <form (ngSubmit)="guardar()" class="form-flex-row">
-      <div class="field-group name">
-        <label>Nombre</label>
-        <input [(ngModel)]="nuevoActivo.nombre" name="nombre" placeholder="Nombre del activo" class="form-input">
-      </div>
-      <div class="field-group serial">
-        <label>Nº Serie</label>
-        <input [(ngModel)]="nuevoActivo.numero_serie" name="numero_serie" placeholder="Nº Serie" class="form-input">
-      </div>
-      <div class="field-group val">
-        <label>Precio</label>
-        <input [(ngModel)]="nuevoActivo.valor" name="valor" type="number" class="form-input">
-      </div>
-      <div class="field-group stock">
-        <label>Cantidad</label>
-        <input [(ngModel)]="nuevoActivo.stock" name="stock" type="number" class="form-input">
-      </div>
-      <button type="submit" class="btn-submit-action">
-        <i class="fas fa-plus"></i> Añadir
-      </button>
-    </form>
-  </section>
+<!-- ═══════════════════════════════════════
+     VISTA: LISTA + FORMULARIO
+     ═══════════════════════════════════════ -->
+<ng-container *ngIf="vista === 'lista'">
 
-  <section class="list-wrapper">
-    <div class="list-head">
-      <div class="col-name">Nombre</div>
-      <div class="col-serial">Nº Serie</div>
-      <div class="col-price">Valor</div>
-      <div class="col-stock">Stock</div>
-      <div class="col-actions">Acciones</div>
-    </div>
+  <div class="inventory-page">
+    <header class="content-header">
+      <h1>Operaciones de Inventario</h1>
+      <p>Gestión y control de activos para <strong>Principal33</strong></p>
+    </header>
 
-    <div class="list-row" *ngFor="let activo of activos">
-      <div class="col-name">
-        <span class="main-text">{{ activo.nombre }}</span>
-        <span class="type-tag">{{ activo.tipo }}</span>
+    <!-- Formulario -->
+    <section class="inventory-card mb-4">
+      <h4 class="form-title">{{ modoEdicion ? 'Editar Activo' : 'Registrar Nuevo Activo' }}</h4>
+
+      <form (ngSubmit)="guardar()" class="form-flex-row">
+        <div class="field-group name">
+          <label>Nombre</label>
+          <input [(ngModel)]="nuevoActivo.nombre" name="nombre"
+                 placeholder="Nombre del activo" class="form-input">
+        </div>
+        <div class="field-group serial">
+          <label>Nº Serie</label>
+          <input [(ngModel)]="nuevoActivo.numero_serie" name="numero_serie"
+                 placeholder="Nº Serie" class="form-input">
+        </div>
+        <div class="field-group val">
+          <label>Precio</label>
+          <input [(ngModel)]="nuevoActivo.valor" name="valor"
+                 type="number" class="form-input">
+        </div>
+        <div class="field-group stock">
+          <label>Cantidad</label>
+          <input [(ngModel)]="nuevoActivo.stock" name="stock"
+                 type="number" class="form-input">
+        </div>
+        <div class="field-group">
+          <label>Fecha Entrada</label>
+          <input [(ngModel)]="nuevoActivo.fechaEntrada" name="fechaEntrada"
+                 type="date" class="form-input">
+        </div>
+        <button type="submit" class="btn-submit-action">
+          <i class="fas fa-plus"></i> {{ modoEdicion ? 'Actualizar' : 'Añadir' }}
+        </button>
+        <button type="button" class="btn-cancel-action" *ngIf="modoEdicion"
+                (click)="cancelarEdicion()">
+          Cancelar
+        </button>
+      </form>
+
+      <!-- Venta (visible solo al editar) -->
+      <div class="form-venta" *ngIf="modoEdicion">
+        <h5 class="form-subtitle">Datos de Venta</h5>
+        <div class="form-flex-row">
+          <div class="field-group">
+            <label>Vendido a</label>
+            <select [(ngModel)]="nuevoActivo.clienteVendidoId" name="clienteVendido"
+                    class="form-input">
+              <option [ngValue]="null">Sin venta</option>
+              <option *ngFor="let c of clientes" [value]="c.id">
+                {{ c.razonSocial }}
+              </option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label>Fecha Venta</label>
+            <input [(ngModel)]="nuevoActivo.fechaVenta" name="fechaVenta"
+                   type="date" class="form-input">
+          </div>
+          <div class="field-group flex-3">
+            <label>Notas</label>
+            <input [(ngModel)]="nuevoActivo.notas" name="notas"
+                   placeholder="Observaciones..." class="form-input">
+          </div>
+        </div>
       </div>
-      <div class="col-serial">{{ activo.numero_serie }}</div>
-      <div class="col-price">{{ activo.valor | currency:'EUR' }}</div>
-      <div class="col-stock">
-        <strong [style.color]="activo.stock <= 5 ? '#e74c3c' : '#27ae60'">{{ activo.stock }}</strong> uds
+
+    </section>
+
+    <!-- Lista -->
+    <section class="list-wrapper">
+      <div class="list-head">
+        <div class="col-name">Nombre</div>
+        <div class="col-serial">Nº Serie</div>
+        <div class="col-price">Valor</div>
+        <div class="col-stock">Stock</div>
+        <div class="col-fecha">Entrada</div>
+        <div class="col-cliente">Vendido a</div>
+        <div class="col-actions">Acciones</div>
       </div>
-      <div class="col-actions">
-        <button (click)="eliminar(activo.id)" class="action-btn-del">
-          <i class="fas fa-trash"></i>
+
+      <div class="list-row" *ngFor="let activo of activos">
+        <div class="col-name">
+          <span class="main-text">{{ activo.nombre }}</span>
+          <span class="type-tag">{{ activo.tipo }}</span>
+        </div>
+        <div class="col-serial">{{ activo.numero_serie || '—' }}</div>
+        <div class="col-price">{{ activo.valor | currency:'EUR' }}</div>
+        <div class="col-stock">
+          <strong [style.color]="(activo.stock ?? 0) <= 5 ? '#e74c3c' : '#27ae60'">
+            {{ activo.stock }}
+          </strong> uds
+        </div>
+        <div class="col-fecha">{{ activo.fechaEntrada || '—' }}</div>
+        <div class="col-cliente">{{ activo.clienteVendidoNombre || '—' }}</div>
+        <div class="col-actions">
+          <button (click)="verDetalle(activo)" class="action-btn-view" title="Ver detalle">
+            <i class="fas fa-eye"></i>
+          </button>
+          <button (click)="prepararEdicion(activo)" class="action-btn-edit" title="Editar">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button (click)="eliminar(activo.id!)" class="action-btn-del" title="Eliminar">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="empty-row" *ngIf="activos.length === 0">
+        No hay activos registrados.
+      </div>
+
+    </section>
+  </div>
+
+</ng-container>
+
+
+<!-- ═══════════════════════════════════════
+     VISTA: DETALLE
+     ═══════════════════════════════════════ -->
+<ng-container *ngIf="vista === 'detalle' && activoDetalle">
+
+  <div class="inventory-page">
+
+    <header class="content-header detalle-header">
+      <div>
+        <h1>{{ activoDetalle.nombre }}</h1>
+        <span class="type-tag-lg">{{ activoDetalle.tipo }}</span>
+      </div>
+      <div class="detalle-header-actions">
+        <button class="btn-submit-action" (click)="prepararEdicion(activoDetalle)">
+          <i class="fas fa-edit"></i> Editar
+        </button>
+        <button class="btn-cancel-action" (click)="volverALista()">
+          <i class="fas fa-arrow-left"></i> Volver
         </button>
       </div>
-    </div>
-  </section>
-</div>
+    </header>
+
+    <!-- Datos del activo -->
+    <section class="inventory-card mb-4">
+      <h4 class="form-title">Datos del Activo</h4>
+      <div class="detalle-grid">
+
+        <div class="detalle-item">
+          <span class="detalle-label">Nombre</span>
+          <span class="detalle-value">{{ activoDetalle.nombre }}</span>
+        </div>
+
+        <div class="detalle-item">
+          <span class="detalle-label">Número de Serie</span>
+          <span class="detalle-value">{{ activoDetalle.numero_serie || '—' }}</span>
+        </div>
+
+        <div class="detalle-item">
+          <span class="detalle-label">Tipo</span>
+          <span class="detalle-value">{{ activoDetalle.tipo || '—' }}</span>
+        </div>
+
+        <div class="detalle-item">
+          <span class="detalle-label">Valor Unitario</span>
+          <span class="detalle-value highlight-blue">
+            {{ activoDetalle.valor | currency:'EUR' }}
+          </span>
+        </div>
+
+        <div class="detalle-item">
+          <span class="detalle-label">Stock Actual</span>
+          <span class="detalle-value"
+                [style.color]="(activoDetalle.stock ?? 0) <= 5 ? '#e74c3c' : '#27ae60'">
+            {{ activoDetalle.stock }} uds
+          </span>
+        </div>
+
+        <div class="detalle-item">
+          <span class="detalle-label">Valor Total en Stock</span>
+          <span class="detalle-value highlight-blue">
+            {{ ((activoDetalle.valor ?? 0) * (activoDetalle.stock ?? 0)) | currency:'EUR' }}
+          </span>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Historial -->
+    <section class="inventory-card">
+      <h4 class="form-title">Historial</h4>
+      <div class="detalle-grid">
+
+        <div class="detalle-item">
+          <span class="detalle-label">Fecha de Entrada</span>
+          <span class="detalle-value">{{ activoDetalle.fechaEntrada || '—' }}</span>
+        </div>
+
+        <div class="detalle-item">
+          <span class="detalle-label">Vendido a</span>
+          <span class="detalle-value">{{ activoDetalle.clienteVendidoNombre || 'Sin venta' }}</span>
+        </div>
+
+        <div class="detalle-item">
+          <span class="detalle-label">Fecha de Venta</span>
+          <span class="detalle-value">{{ activoDetalle.fechaVenta || '—' }}</span>
+        </div>
+
+        <div class="detalle-item detalle-item--full">
+          <span class="detalle-label">Notas</span>
+          <span class="detalle-value">{{ activoDetalle.notas || '—' }}</span>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+
+</ng-container>
