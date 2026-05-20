@@ -13,6 +13,12 @@ import {
 } from '../models/factura.model';
 import { forkJoin, of } from 'rxjs';
 import { switchMap, tap } from 'rxjs/operators';
+import { FacturaCompraService } from '../services/factura-compra.service';
+import {
+  FacturaCompraRequest,
+  FacturaCompraResponse,
+  LineaFacturaCompraRequest
+} from '../models/factura-compra.model';
 
 
 @Component({
@@ -31,7 +37,7 @@ export class FacturaListComponent implements OnInit {
   notificacion = '';
   empresaEmail = 'facturacion@optimus-erp.com';
 
-  vista: 'lista' | 'form' | 'detalle' = 'lista';
+  vista: 'lista' | 'form' | 'detalle' | 'form-compra' | 'detalle-compra' = 'lista';
   facturaDetalle: FacturaResponse | null = null;
   modoEdicion = false;
   facturaEditandoId: number | null = null;
@@ -50,13 +56,15 @@ export class FacturaListComponent implements OnInit {
     private facturaService: FacturaService,
     private clienteService: ClienteService,
     private activoService: ActivoService,
-    private facturaPdfService: FacturaPdfService
+    private facturaPdfService: FacturaPdfService,
+    private facturaCompraService: FacturaCompraService
   ) {}
 
   ngOnInit(): void {
     this.cargarFacturas();
     this.clienteService.listar().subscribe(data => this.clientes = data);
     this.cargarActivosInventario();
+    this.cargarCompras();
   }
 
   cargarActivosInventario(): void {
@@ -307,5 +315,123 @@ export class FacturaListComponent implements OnInit {
       PAGADA:    [],
       CANCELADA: []
     }[estado] as EstadoFactura[];
+  }
+
+  compras: FacturaCompraResponse[] = [];
+  compraDetalle: FacturaCompraResponse | null = null;
+  filtroEstadoCompra: EstadoFactura | '' = '';
+ 
+  nuevaCompra: FacturaCompraRequest = {
+    proveedor: '',
+    fechaEmision: new Date().toISOString().split('T')[0],
+    ivaPorcentaje: 21,
+    notas: '',
+    lineas: []
+  };
+
+  // ── Carga ────────────────────────────────────────────────────
+  cargarCompras(): void {
+    const obs = this.filtroEstadoCompra
+      ? this.facturaCompraService.listarPorEstado(this.filtroEstadoCompra as EstadoFactura)
+      : this.facturaCompraService.listar();
+ 
+    obs.subscribe({
+      next: data => this.compras = data,
+      error: err => console.error('Error cargando compras', err)
+    });
+  }
+ 
+  // ── Navegación ───────────────────────────────────────────────
+  abrirFormularioCompra(): void {
+    this.nuevaCompra = {
+      proveedor: '',
+      fechaEmision: new Date().toISOString().split('T')[0],
+      ivaPorcentaje: 21,
+      notas: '',
+      lineas: []
+    };
+    this.agregarLineaCompra();
+    this.vista = 'form-compra';
+  }
+ 
+  verDetalleCompra(c: FacturaCompraResponse): void {
+    this.compraDetalle = c;
+    this.vista = 'detalle-compra';
+  }
+ 
+  // ── Líneas ───────────────────────────────────────────────────
+  agregarLineaCompra(): void {
+    this.nuevaCompra.lineas.push({
+      descripcion: '',
+      cantidad: 1,
+      precioUnitario: 0,
+      activoId: null
+    });
+  }
+ 
+  eliminarLineaCompra(idx: number): void {
+    this.nuevaCompra.lineas.splice(idx, 1);
+  }
+ 
+  actualizarActivoCompra(linea: LineaFacturaCompraRequest): void {
+    const desc = linea.descripcion?.trim().toLowerCase() || '';
+    if (!desc) { linea.activoId = null; return; }
+    const activo = this.activos.find(a => a.nombre.trim().toLowerCase() === desc);
+    linea.activoId = activo ? activo.id ?? null : null;
+  }
+ 
+  // ── Cálculos ─────────────────────────────────────────────────
+  calcularSubtotalLineaCompra(linea: LineaFacturaCompraRequest): number {
+    return +(linea.cantidad * linea.precioUnitario).toFixed(2);
+  }
+ 
+  calcularBaseCompra(): number {
+    return +this.nuevaCompra.lineas
+      .reduce((acc, l) => acc + l.cantidad * l.precioUnitario, 0)
+      .toFixed(2);
+  }
+ 
+  calcularTotalCompra(): number {
+    const base = this.calcularBaseCompra();
+    return +(base + base * (this.nuevaCompra.ivaPorcentaje / 100)).toFixed(2);
+  }
+ 
+  // ── Guardar ──────────────────────────────────────────────────
+  guardarCompra(): void {
+    if (this.nuevaCompra.lineas.length === 0) return;
+ 
+    this.facturaCompraService.crear(this.nuevaCompra).subscribe({
+      next: () => {
+        this.cargarCompras();
+        this.cargarActivosInventario(); // refresca stock en inventario
+        this.volverALista();
+        this.mostrarNotificacion('Compra registrada · stock actualizado');
+      },
+      error: err => console.error('Error guardando compra', err)
+    });
+  }
+ 
+  // ── Cambiar estado ───────────────────────────────────────────
+  cambiarEstadoCompra(id: number, estado: EstadoFactura): void {
+    this.facturaCompraService.cambiarEstado(id, estado).subscribe({
+      next: () => {
+        this.cargarCompras();
+        this.mostrarNotificacion(`Compra marcada como ${estado}`);
+      },
+      error: err => console.error('Error cambiando estado compra', err)
+    });
+  }
+ 
+  // ── Eliminar ─────────────────────────────────────────────────
+  eliminarCompra(id: number): void {
+    if (!confirm('¿Eliminar esta compra? El stock añadido se revertirá.')) return;
+    this.facturaCompraService.eliminar(id).subscribe({
+      next: () => {
+        this.cargarCompras();
+        this.cargarActivosInventario();
+        this.mostrarNotificacion('Compra eliminada · stock revertido');
+      },
+      error: err => console.error('Error eliminando compra', err)
+    });
   }
 }
