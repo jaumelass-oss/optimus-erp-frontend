@@ -32,6 +32,7 @@ export interface FacturaResponse {
   clienteCif?: string;
   clienteEmail?: string;
   fechaEmision: string;
+  fechaPago?: string | null;
   estado: EstadoFactura;
   baseImponible: number;
   ivaPorcentaje: number;

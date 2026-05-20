@@ -330,7 +330,7 @@
 
 .detalle-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  grid-template-columns: repeat(4, minmax(160px, 1fr));
   gap: 1.25rem;
 }
 
@@ -345,6 +345,22 @@
   text-transform: uppercase;
   letter-spacing: .06em;
   opacity: .45;
+}
+
+.fecha-pago {
+  color: #16a34a;
+  font-weight: 700;
+}
+
+.email-empresa {
+  color: #2563eb;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+.total-item {
+  grid-column: 4;
+  justify-self: end;
 }
 
 .detalle-item span { font-size: 1rem; font-weight: 600; }

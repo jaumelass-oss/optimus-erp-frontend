@@ -36,6 +36,7 @@
           <th>Nº Factura</th>
           <th>Cliente</th>
           <th>Fecha</th>
+          <th>Fecha Pago</th>
           <th>Base</th>
           <th>Total (IVA inc.)</th>
           <th>Estado</th>
@@ -47,6 +48,7 @@
           <td><code class="numero-factura">{{ f.numeroFactura }}</code></td>
           <td><strong>{{ f.clienteRazonSocial }}</strong></td>
           <td>{{ f.fechaEmision }}</td>
+          <td>{{ f.fechaPago || '—' }}</td>
           <td>{{ f.baseImponible | number:'1.2-2' }} €</td>
           <td class="total-col">{{ f.totalEur | number:'1.2-2' }} €</td>
           <td>
@@ -255,6 +257,10 @@
         <label>Fecha Emisión</label>
         <span>{{ facturaDetalle.fechaEmision }}</span>
       </div>
+      <div class="detalle-item" *ngIf="facturaDetalle.fechaPago">
+        <label>Fecha Pago</label>
+        <span class="fecha-pago">{{ facturaDetalle.fechaPago }}</span>
+      </div>
       <div class="detalle-item">
         <label>Base Imponible</label>
         <span>{{ facturaDetalle.baseImponible | number:'1.2-2' }} €</span>
@@ -265,7 +271,7 @@
       </div>
       <div class="detalle-item">
         <label>Email empresa</label>
-        <span>{{ empresaEmail }}</span>
+        <span class= "email-empresa">{{ empresaEmail }}</span>
       </div>
       <div class="detalle-item total-item">
         <label>TOTAL</label>
