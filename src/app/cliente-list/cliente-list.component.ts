@@ -19,12 +19,7 @@ export class ClienteListComponent implements OnInit {
   clienteEditandoId: number | null = null;
   notificacion = '';
 
-  nuevoCliente: Cliente = {
-    razonSocial: '',
-    cifVies: '',
-    pais: 'España',
-    emailFacturacion: ''
-  };
+  nuevoCliente: Cliente = this.clienteVacio();
 
   constructor(private clienteService: ClienteService) {}
 
@@ -87,7 +82,7 @@ export class ClienteListComponent implements OnInit {
   }
 
   resetFormulario(): void {
-    this.nuevoCliente = { razonSocial: '', cifVies: '', pais: 'España', emailFacturacion: '' };
+    this.nuevoCliente = this.clienteVacio();
     this.modoEdicion = false;
     this.clienteEditandoId = null;
     this.mostrarFormulario = false;
@@ -96,5 +91,35 @@ export class ClienteListComponent implements OnInit {
   mostrarNotificacion(msg: string): void {
     this.notificacion = msg;
     setTimeout(() => this.notificacion = '', 3000);
+  }
+
+  formaPagoLabel(forma?: string): string {
+    return { CONTADO: 'Contado', '30_DIAS': '30 días', '60_DIAS': '60 días' }[forma ?? ''] ?? '—';
+  }
+
+  medioPagoLabel(medio?: string): string {
+    return { TRANSFERENCIA: 'Transferencia', GIRO: 'Giro' }[medio ?? ''] ?? '—';
+  }
+
+  private clienteVacio(): Cliente {
+    return {
+      razonSocial: '',
+      cifVies: '',
+      pais: 'España',
+      emailFacturacion: '',
+      telefono: '',
+      direccion: '',
+      ciudad: '',
+      codigoPostal: '',
+      formaPago: 'CONTADO',
+      medioPago: 'TRANSFERENCIA',
+      diasVencimiento: 0
+    };
+  }
+
+  clienteSeleccionado: Cliente | null = null;
+
+  verDetalle(cliente: Cliente) {
+    this.clienteSeleccionado = cliente;
   }
 }

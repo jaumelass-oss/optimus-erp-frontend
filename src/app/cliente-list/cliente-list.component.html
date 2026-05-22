@@ -5,82 +5,147 @@
   <p>Gestión de clientes para <strong>Principal33</strong></p>
 </header>
 
-<!-- Formulario -->
 <section class="inventory-card mb-4" *ngIf="mostrarFormulario">
   <h4 class="form-title">{{ modoEdicion ? 'Editar Cliente' : 'Nuevo Cliente' }}</h4>
-  <form (ngSubmit)="guardar()" class="form-flex-row">
-
-    <div class="field-group">
-      <label>Razón Social</label>
-      <input [(ngModel)]="nuevoCliente.razonSocial" name="razonSocial"
-             placeholder="Empresa S.L." class="form-input" required />
+  <form (ngSubmit)="guardar()">
+    <div class="form-grid">
+      <div class="field-group">
+        <label>Razón Social *</label>
+        <input [(ngModel)]="nuevoCliente.razonSocial" name="razonSocial" placeholder="Empresa S.L." class="form-input" required />
+      </div>
+      <div class="field-group">
+        <label>CIF / VIES *</label>
+        <input [(ngModel)]="nuevoCliente.cifVies" name="cifVies" placeholder="B12345678" class="form-input" required />
+      </div>
+      <div class="field-group">
+        <label>Email Facturación</label>
+        <input [(ngModel)]="nuevoCliente.emailFacturacion" name="emailFacturacion" type="email" placeholder="facturas@empresa.com" class="form-input" />
+      </div>
+      <div class="field-group">
+        <label>Teléfono</label>
+        <input [(ngModel)]="nuevoCliente.telefono" name="telefono" placeholder="+34 600 000 000" class="form-input" />
+      </div>
+      <div class="field-group">
+        <label>Dirección</label>
+        <input [(ngModel)]="nuevoCliente.direccion" name="direccion" placeholder="Calle Mayor, 1" class="form-input" />
+      </div>
+      <div class="field-group">
+        <label>Código Postal</label>
+        <input [(ngModel)]="nuevoCliente.codigoPostal" name="codigoPostal" placeholder="28001" class="form-input" />
+      </div>
+      <div class="field-group">
+        <label>País</label>
+        <input [(ngModel)]="nuevoCliente.pais" name="pais" placeholder="España" class="form-input" />
+      </div>
+      <div class="field-group">
+        <label>Forma de Pago</label>
+        <select [(ngModel)]="nuevoCliente.formaPago" name="formaPago" class="form-input">
+          <option value="CONTADO">Contado</option>
+          <option value="30_DIAS">30 días</option>
+          <option value="60_DIAS">60 días</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label>Medio de Pago</label>
+        <select [(ngModel)]="nuevoCliente.medioPago" name="medioPago" class="form-input">
+          <option value="TRANSFERENCIA">Transferencia</option>
+          <option value="GIRO">Giro</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label>Días Vencimiento</label>
+        <input type="number" [(ngModel)]="nuevoCliente.diasVencimiento" name="diasVencimiento" placeholder="30" class="form-input" />
+      </div>
     </div>
 
-    <div class="field-group">
-      <label>CIF / VIES</label>
-      <input [(ngModel)]="nuevoCliente.cifVies" name="cifVies"
-             placeholder="B12345678" class="form-input" required />
+    <div class="form-actions mt-1">
+      <button type="submit" class="btn-primary">
+        <i class="fas fa-save"></i> {{ modoEdicion ? 'Actualizar' : 'Guardar' }}
+      </button>
+      <button type="button" class="btn-secondary" (click)="toggleFormulario()">Cancelar</button>
     </div>
-
-    <div class="field-group">
-      <label>País</label>
-      <input [(ngModel)]="nuevoCliente.pais" name="pais"
-             placeholder="España" class="form-input" />
-    </div>
-
-    <div class="field-group">
-      <label>Email Facturación</label>
-      <input [(ngModel)]="nuevoCliente.emailFacturacion" name="emailFacturacion"
-             type="email" placeholder="facturas@empresa.com" class="form-input" />
-    </div>
-
-    <button type="submit" class="btn-submit-action">
-      <i class="fas fa-save"></i> {{ modoEdicion ? 'Actualizar' : 'Guardar' }}
-    </button>
-    <button type="button" class="btn-cancel-action" (click)="toggleFormulario()">
-      Cancelar
-    </button>
   </form>
 </section>
 
-<!-- Botón abrir formulario -->
-<div class="actions-bar">
-  <button class="btn-submit-action" (click)="toggleFormulario()" *ngIf="!mostrarFormulario">
+<div class="actions-bar" *ngIf="!mostrarFormulario">
+  <button class="btn-primary" (click)="toggleFormulario()">
     <i class="fas fa-plus"></i> Nuevo Cliente
   </button>
 </div>
 
-<!-- Tabla -->
 <section class="inventory-card">
-  <table class="tabla-activos" *ngIf="clientes.length > 0; else sinClientes">
-    <thead>
-      <tr>
-        <th>Razón Social</th>
-        <th>CIF / VIES</th>
-        <th>País</th>
-        <th>Email</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let c of clientes">
-        <td><strong>{{ c.razonSocial }}</strong></td>
-        <td><code>{{ c.cifVies }}</code></td>
-        <td>{{ c.pais }}</td>
-        <td>{{ c.emailFacturacion || '—' }}</td>
-        <td class="acciones">
-          <button class="btn-edit" (click)="prepararEdicion(c)">
-            <i class="fas fa-edit"></i>
-          </button>
-          <button class="btn-delete" (click)="eliminar(c.id!)">
-            <i class="fas fa-trash"></i>
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-
+  <div class="tabla-contenedor">
+    <table class="tabla-activos" *ngIf="clientes.length > 0; else sinClientes">
+      <thead>
+        <tr>
+          <th>Razón Social</th>
+          <th>CIF / VIES</th>
+          <th class="d-none d-lg-table-cell">Teléfono</th>
+          <th class="d-none d-md-table-cell">Dirección</th>
+          <th class="d-none d-md-table-cell">C.P.</th>
+          <th class="d-none d-lg-table-cell">País</th>
+          <th>Email</th>
+          <th class="d-none d-lg-table-cell">Forma Pago</th>
+          <th class="d-none d-lg-table-cell">Medio Pago</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let c of clientes">
+          <td><strong>{{ c.razonSocial }}</strong></td>
+          <td><code>{{ c.cifVies }}</code></td>
+          <td class="d-none d-lg-table-cell">{{ c.telefono || '—' }}</td>
+          <td class="d-none d-md-table-cell">{{ c.direccion || '—' }}</td>
+          <td class="d-none d-md-table-cell">{{ c.codigoPostal || '—' }}</td>
+          <td class="d-none d-lg-table-cell">{{ c.pais }}</td>
+          <td>{{ c.emailFacturacion || '—' }}</td>
+          <td class="d-none d-lg-table-cell">
+            <span class="badge-pago">{{ formaPagoLabel(c.formaPago) }}</span>
+          </td>
+          <td class="d-none d-lg-table-cell">
+            <span class="badge-medio">{{ medioPagoLabel(c.medioPago) }}</span>
+          </td>
+          <td class="acciones">
+            <td class="acciones">
+  <button class="btn-icon btn-info" title="Ver detalle" (click)="verDetalle(c)">
+    <i class="fas fa-eye"></i>
+  </button>
+  
+  <button class="btn-icon btn-edit" title="Editar" (click)="prepararEdicion(c)">
+    <i class="fas fa-edit"></i>
+  </button>
+  <button class="btn-icon btn-delete" title="Eliminar" (click)="eliminar(c.id!)">
+    <i class="fas fa-trash"></i>
+  </button>
+</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
   <ng-template #sinClientes>
-    <p class="empty-state">No hay clientes registrados aún.</p>
+    <div class="empty-state">
+      <i class="fas fa-users fa-2x"></i>
+      <p>No hay clientes registrados aún.</p>
+    </div>
   </ng-template>
 </section>
+
+<div class="modal-overlay" *ngIf="clienteSeleccionado" (click)="clienteSeleccionado = null">
+  <div class="modal-content inventory-card" (click)="$event.stopPropagation()">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h3>Detalles del Cliente</h3>
+      <button class="btn-secondary" (click)="clienteSeleccionado = null">Cerrar</button>
+    </div>
+    <hr>
+    <div class="detalles-grid">
+      <p><strong>Razón Social:</strong> {{ clienteSeleccionado.razonSocial }}</p>
+      <p><strong>CIF/VIES:</strong> {{ clienteSeleccionado.cifVies }}</p>
+      <p><strong>Teléfono:</strong> {{ clienteSeleccionado.telefono || '—' }}</p>
+      <p><strong>Dirección:</strong> {{ clienteSeleccionado.direccion || '—' }}</p>
+      <p><strong>C.P.:</strong> {{ clienteSeleccionado.codigoPostal || '—' }}</p>
+      <p><strong>Email:</strong> {{ clienteSeleccionado.emailFacturacion || '—' }}</p>
+      <p><strong>Forma de Pago:</strong> {{ formaPagoLabel(clienteSeleccionado.formaPago) }}</p>
+      <p><strong>Medio de Pago:</strong> {{ medioPagoLabel(clienteSeleccionado.medioPago) }}</p>
+    </div>
+  </div>
+</div>
