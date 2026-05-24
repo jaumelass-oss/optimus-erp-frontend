@@ -1,10 +1,8 @@
-export type Sede = 'VALENCIA' | 'RUMANIA' | 'ALEMANIA';
- 
 export interface Departamento {
   id?: number;
   nombre: string;
-  sede: Sede;
   totalEmpleados?: number;
+  empleados?: EmpleadoResumen[];
 }
  
 export interface Empleado {
@@ -15,5 +13,12 @@ export interface Empleado {
   emailCorporativo?: string;
   departamentoId?: number | null;
   departamentoNombre?: string;
+  tarifaHora?: number;
+}
+
+export interface EmpleadoResumen {
+  id: number;
+  nombreCompleto: string;
+  emailCorporativo?: string;
   tarifaHora?: number;
 }

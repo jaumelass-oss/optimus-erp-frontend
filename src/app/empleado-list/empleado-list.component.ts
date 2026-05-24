@@ -16,19 +16,15 @@ export class EmpleadoListComponent implements OnInit {
 
   empleados: Empleado[] = [];
   departamentos: Departamento[] = [];
+  empleadoDetalle: Empleado | null = null;
+  vista: 'lista' | 'form' | 'detalle' = 'lista';
   notificacion = '';
-
-  mostrarFormulario = false;
   modoEdicion = false;
   empleadoEditandoId: number | null = null;
-
   filtroBuscar = '';
   filtroDepartamento: number | '' = '';
 
-  nuevoEmpleado: Empleado = {
-    nombre: '', apellidos: '', emailCorporativo: '',
-    departamentoId: null, tarifaHora: 0
-  };
+  nuevoEmpleado: Empleado = this.empleadoVacio();
 
   constructor(
     private empleadoService: EmpleadoService,
@@ -50,6 +46,37 @@ export class EmpleadoListComponent implements OnInit {
     obs.subscribe({ next: d => this.empleados = d, error: e => console.error(e) });
   }
 
+  // ── Navegación ───────────────────────────────────────────────
+
+  abrirFormularioNuevo(): void {
+    this.modoEdicion = false;
+    this.empleadoEditandoId = null;
+    this.nuevoEmpleado = this.empleadoVacio();
+    this.vista = 'form';
+  }
+
+  abrirEdicion(e: Empleado): void {
+    this.modoEdicion = true;
+    this.empleadoEditandoId = e.id!;
+    this.nuevoEmpleado = { ...e };
+    this.vista = 'form';
+  }
+
+  verDetalle(e: Empleado): void {
+    this.empleadoDetalle = e;
+    this.vista = 'detalle';
+  }
+
+  volverALista(): void {
+    this.vista = 'lista';
+    this.empleadoDetalle = null;
+    this.modoEdicion = false;
+    this.empleadoEditandoId = null;
+    this.nuevoEmpleado = this.empleadoVacio();
+  }
+
+  // ── CRUD ─────────────────────────────────────────────────────
+
   guardar(): void {
     if (!this.nuevoEmpleado.nombre || !this.nuevoEmpleado.apellidos) return;
 
@@ -60,34 +87,26 @@ export class EmpleadoListComponent implements OnInit {
     op.subscribe({
       next: () => {
         this.cargarEmpleados();
-        this.resetFormulario();
+        this.volverALista();
         this.mostrarNotif(this.modoEdicion ? 'Empleado actualizado' : 'Empleado creado');
       },
       error: e => console.error(e)
     });
   }
 
-  prepararEdicion(e: Empleado): void {
-    this.modoEdicion = true;
-    this.empleadoEditandoId = e.id!;
-    this.nuevoEmpleado = { ...e };
-    this.mostrarFormulario = true;
-  }
-
   eliminar(id: number): void {
     if (!confirm('¿Eliminar este empleado?')) return;
     this.empleadoService.eliminar(id).subscribe({
-      next: () => { this.cargarEmpleados(); this.mostrarNotif('Empleado eliminado'); },
+      next: () => {
+        this.cargarEmpleados();
+        this.volverALista();
+        this.mostrarNotif('Empleado eliminado');
+      },
       error: e => console.error(e)
     });
   }
 
-  resetFormulario(): void {
-    this.nuevoEmpleado = { nombre: '', apellidos: '', emailCorporativo: '', departamentoId: null, tarifaHora: 0 };
-    this.modoEdicion = false;
-    this.empleadoEditandoId = null;
-    this.mostrarFormulario = false;
-  }
+  // ── Filtros ──────────────────────────────────────────────────
 
   aplicarFiltros(): void { this.cargarEmpleados(); }
 
@@ -97,6 +116,8 @@ export class EmpleadoListComponent implements OnInit {
     this.cargarEmpleados();
   }
 
+  // ── Helpers ──────────────────────────────────────────────────
+
   mostrarNotif(msg: string): void {
     this.notificacion = msg;
     setTimeout(() => this.notificacion = '', 3000);
@@ -104,5 +125,9 @@ export class EmpleadoListComponent implements OnInit {
 
   inicialesEmpleado(e: Empleado): string {
     return (e.nombre[0] + e.apellidos[0]).toUpperCase();
+  }
+
+  private empleadoVacio(): Empleado {
+    return { nombre: '', apellidos: '', emailCorporativo: '', departamentoId: null, tarifaHora: 0 };
   }
 }

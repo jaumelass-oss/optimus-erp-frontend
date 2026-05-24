@@ -1,61 +1,159 @@
 <div class="pill-notificacion" *ngIf="notificacion">{{ notificacion }}</div>
 
-<header class="content-header">
-  <div>
-    <h1>Departamentos</h1>
-    <p>Estructura organizativa · <strong>Principal33</strong></p>
-  </div>
-  <button class="btn-primary" (click)="mostrarFormulario = true" *ngIf="!mostrarFormulario">
-    <i class="fas fa-plus"></i> Nuevo Departamento
-  </button>
-</header>
-
-<section class="inventory-card mb-4" *ngIf="mostrarFormulario">
-  <h4 class="form-title">{{ modoEdicion ? 'Editar Departamento' : 'Nuevo Departamento' }}</h4>
-  <form (ngSubmit)="guardar()" class="form-flex-row">
-
-    <div class="field-group flex-2">
-      <label>Nombre *</label>
-      <input [(ngModel)]="nuevo.nombre" name="nombre"
-             placeholder="Desarrollo, RRHH, Finanzas..." class="form-input" required />
+<!-- ══ VISTA LISTA ══ -->
+<ng-container *ngIf="vista === 'lista'">
+  <header class="content-header">
+    <div>
+      <h1>Departamentos</h1>
+      <p>Estructura organizativa · <strong>Principal33</strong></p>
     </div>
-
-    <div class="field-group flex-1">
-      <label>Sede</label>
-      <select [(ngModel)]="nuevo.sede" name="sede" class="form-input">
-        <option *ngFor="let s of sedes" [value]="s">{{ s }}</option>
-      </select>
-    </div>
-
-    <button type="submit" class="btn-primary">
-      <i class="fas fa-save"></i> {{ modoEdicion ? 'Actualizar' : 'Guardar' }}
+    <button class="btn-primary" (click)="abrirFormularioNuevo()">
+      <i class="fas fa-plus"></i> Nuevo Departamento
     </button>
-    <button type="button" class="btn-secondary" (click)="reset()">Cancelar</button>
-  </form>
-</section>
+  </header>
 
-<div class="dept-grid" *ngIf="departamentos.length > 0; else sinDept">
-  <div class="dept-card" *ngFor="let d of departamentos">
-    <div class="dept-icon"><i class="fas fa-building"></i></div>
-    <div class="dept-info">
-      <h3>{{ d.nombre }}</h3>
-      <div class="dept-meta">
-        <span [class]="'sede-badge ' + sedeBadge(d.sede)">{{ d.sede }}</span>
-        <span class="emp-count">
-          <i class="fas fa-users"></i> {{ d.totalEmpleados }} empleado(s)
-        </span>
+  <div class="filtros-bar">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input [(ngModel)]="filtroBuscar" placeholder="Buscar departamento..."
+             class="search-input" (ngModelChange)="aplicarFiltro()" />
+    </div>
+    <button class="btn-ghost btn-sm" (click)="limpiarFiltro()" *ngIf="filtroBuscar">
+      <i class="fas fa-times"></i> Limpiar
+    </button>
+  </div>
+
+  <div class="dept-grid" *ngIf="departamentosFiltrados.length > 0; else sinDept">
+    <div class="dept-card" *ngFor="let d of departamentosFiltrados">
+      <div class="dept-icon"><i class="fas fa-building"></i></div>
+      <div class="dept-info">
+        <h3>{{ d.nombre }}</h3>
+        <div class="dept-meta">
+          <span class="emp-count">
+            <i class="fas fa-users"></i> {{ d.totalEmpleados }} empleado(s)
+          </span>
+        </div>
+      </div>
+      <div class="dept-acciones">
+        <button class="btn-icon btn-view" title="Ver detalle" (click)="verDetalle(d)">
+          <i class="fas fa-eye"></i>
+        </button>
+        <button class="btn-icon btn-edit" title="Editar" (click)="abrirEdicion(d)">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button class="btn-icon btn-delete" title="Eliminar" (click)="eliminar(d.id!)">
+          <i class="fas fa-trash"></i>
+        </button>
       </div>
     </div>
-    <div class="dept-acciones">
-      <button class="btn-icon btn-edit" (click)="prepararEdicion(d)"><i class="fas fa-edit"></i></button>
-      <button class="btn-icon btn-delete" (click)="eliminar(d.id!)"><i class="fas fa-trash"></i></button>
-    </div>
   </div>
-</div>
 
-<ng-template #sinDept>
-  <div class="empty-state">
-    <i class="fas fa-building fa-2x"></i>
-    <p>No hay departamentos creados aún.</p>
-  </div>
-</ng-template>
+  <ng-template #sinDept>
+    <div class="empty-state">
+      <i class="fas fa-building fa-2x"></i>
+      <p>No hay departamentos creados aún.</p>
+      <button class="btn-primary mt-1" (click)="abrirFormularioNuevo()">
+        Crear primer departamento
+      </button>
+    </div>
+  </ng-template>
+</ng-container>
+
+<!-- ══ VISTA FORMULARIO ══ -->
+<ng-container *ngIf="vista === 'form'">
+  <header class="content-header">
+    <div>
+      <h1>{{ modoEdicion ? 'Editar Departamento' : 'Nuevo Departamento' }}</h1>
+      <p>Completa los datos del departamento</p>
+    </div>
+    <button class="btn-secondary" (click)="volverALista()">
+      <i class="fas fa-arrow-left"></i> Volver
+    </button>
+  </header>
+
+  <form (ngSubmit)="guardar()">
+    <section class="inventory-card mb-4">
+      <h4 class="form-title">Datos del Departamento</h4>
+      <div class="form-grid">
+        <div class="field-group">
+          <label>Nombre *</label>
+          <input [(ngModel)]="nuevo.nombre" name="nombre"
+                 placeholder="Finanzas, RRHH, Desarrollo..."
+                 class="form-input" required />
+        </div>
+      </div>
+    </section>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-primary" [disabled]="!nuevo.nombre">
+        <i class="fas fa-save"></i> {{ modoEdicion ? 'Actualizar' : 'Guardar' }}
+      </button>
+      <button type="button" class="btn-secondary" (click)="volverALista()">Cancelar</button>
+    </div>
+  </form>
+</ng-container>
+
+<!-- ══ VISTA DETALLE ══ -->
+<ng-container *ngIf="vista === 'detalle' && deptDetalle">
+  <header class="content-header">
+    <div>
+      <h1>{{ deptDetalle.nombre }}</h1>
+      <p>{{ deptDetalle.totalEmpleados }} empleado(s)</p>
+    </div>
+    <div class="detalle-actions">
+      <button class="btn-primary" (click)="abrirEdicion(deptDetalle)">
+        <i class="fas fa-edit"></i> Editar
+      </button>
+      <button class="btn-danger" (click)="eliminar(deptDetalle.id!)">
+        <i class="fas fa-trash"></i> Eliminar
+      </button>
+      <button class="btn-secondary" (click)="volverALista()">
+        <i class="fas fa-arrow-left"></i> Volver
+      </button>
+    </div>
+  </header>
+
+  <section class="inventory-card mb-4">
+    <h4 class="form-title">Información del Departamento</h4>
+    <div class="detalle-grid">
+      <div class="detalle-item">
+        <label>Nombre</label>
+        <span>{{ deptDetalle.nombre }}</span>
+      </div>
+      <div class="detalle-item">
+        <label>Total Empleados</label>
+        <span>{{ deptDetalle.totalEmpleados ?? 0 }}</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="inventory-card" *ngIf="deptDetalle.empleados && deptDetalle.empleados.length > 0; else sinEmpleadosDept">
+    <h4 class="form-title">Empleados del Departamento</h4>
+    <table class="tabla-activos">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Email</th>
+          <th>Tarifa / h</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let e of deptDetalle.empleados">
+          <td><strong>{{ e.nombreCompleto }}</strong></td>
+          <td>{{ e.emailCorporativo || '—' }}</td>
+          <td>{{ e.tarifaHora ? (e.tarifaHora | number:'1.2-2') + ' €/h' : '—' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <ng-template #sinEmpleadosDept>
+    <section class="inventory-card">
+      <div class="empty-state">
+        <i class="fas fa-users fa-2x"></i>
+        <p>Este departamento no tiene empleados asignados.</p>
+      </div>
+    </section>
+  </ng-template>
+
+</ng-container>

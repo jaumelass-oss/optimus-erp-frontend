@@ -1,122 +1,208 @@
 <div class="pill-notificacion" *ngIf="notificacion">{{ notificacion }}</div>
 
-<header class="content-header">
-  <div>
-    <h1>Empleados</h1>
-    <p>Gestión de personal · <strong>Principal33</strong></p>
-  </div>
-  <button class="btn-primary" (click)="mostrarFormulario = true" *ngIf="!mostrarFormulario">
-    <i class="fas fa-user-plus"></i> Nuevo Empleado
-  </button>
-</header>
+<!-- ══ VISTA LISTA ══ -->
+<ng-container *ngIf="vista === 'lista'">
 
-<section class="inventory-card mb-4" *ngIf="mostrarFormulario">
-  <h4 class="form-title">{{ modoEdicion ? 'Editar Empleado' : 'Nuevo Empleado' }}</h4>
-  <form (ngSubmit)="guardar()" class="form-grid">
-
-    <div class="field-group">
-      <label>Nombre *</label>
-      <input [(ngModel)]="nuevoEmpleado.nombre" name="nombre"
-             placeholder="Ana" class="form-input" required />
+  <header class="content-header">
+    <div>
+      <h1>Empleados</h1>
+      <p>Gestión de personal · <strong>Principal33</strong></p>
     </div>
+    <button class="btn-primary" (click)="abrirFormularioNuevo()">
+      <i class="fas fa-user-plus"></i> Nuevo Empleado
+    </button>
+  </header>
 
-    <div class="field-group">
-      <label>Apellidos *</label>
-      <input [(ngModel)]="nuevoEmpleado.apellidos" name="apellidos"
-             placeholder="García López" class="form-input" required />
-    </div>
-
-    <div class="field-group">
-      <label>Email Corporativo</label>
-      <input [(ngModel)]="nuevoEmpleado.emailCorporativo" name="email"
-             type="email" placeholder="ana@principal33.com" class="form-input" />
-    </div>
-
-    <div class="field-group">
-      <label>Departamento</label>
-      <select [(ngModel)]="nuevoEmpleado.departamentoId" name="departamento" class="form-input">
-        <option [ngValue]="null">Sin departamento</option>
-        <option *ngFor="let d of departamentos" [value]="d.id">
-          {{ d.nombre }} ({{ d.sede }})
-        </option>
-      </select>
-    </div>
-
-    <div class="field-group">
-      <label>Tarifa / Hora (€)</label>
-      <input [(ngModel)]="nuevoEmpleado.tarifaHora" name="tarifa"
-             type="number" min="0" step="0.01" class="form-input" />
-    </div>
-
-    <div class="form-actions-inline">
-      <button type="submit" class="btn-primary">
-        <i class="fas fa-save"></i> {{ modoEdicion ? 'Actualizar' : 'Guardar' }}
-      </button>
-      <button type="button" class="btn-secondary" (click)="resetFormulario()">
-        Cancelar
-      </button>
-    </div>
-
-  </form>
-</section>
-
-<div class="filtros-bar">
+  <div class="filtros-bar">
   <div class="search-box">
     <i class="fas fa-search"></i>
     <input [(ngModel)]="filtroBuscar" placeholder="Buscar por nombre..."
-           class="search-input" (keyup.enter)="aplicarFiltros()" />
+           class="search-input" (ngModelChange)="aplicarFiltros()" />
   </div>
-
   <select [(ngModel)]="filtroDepartamento" class="form-input filter-select"
           (change)="aplicarFiltros()">
     <option value="">Todos los departamentos</option>
     <option *ngFor="let d of departamentos" [value]="d.id">{{ d.nombre }}</option>
   </select>
-
-  <button class="btn-secondary btn-sm" (click)="aplicarFiltros()">
-    <i class="fas fa-filter"></i> Filtrar
-  </button>
-  <button class="btn-ghost btn-sm" (click)="limpiarFiltros()" *ngIf="filtroBuscar || filtroDepartamento">
+  <button class="btn-ghost btn-sm" (click)="limpiarFiltros()"
+          *ngIf="filtroBuscar || filtroDepartamento">
     <i class="fas fa-times"></i> Limpiar
   </button>
 </div>
 
-<div class="empleados-grid" *ngIf="empleados.length > 0; else sinEmpleados">
-  <div class="empleado-card" *ngFor="let e of empleados">
-
-    <div class="empleado-avatar">{{ inicialesEmpleado(e) }}</div>
-
-    <div class="empleado-info">
-      <h3>{{ e.nombreCompleto }}</h3>
-      <p class="empleado-email">
-        <i class="fas fa-envelope"></i>
-        {{ e.emailCorporativo || 'Sin email' }}
-      </p>
-      <div class="empleado-meta">
-        <span class="tag-dept" *ngIf="e.departamentoNombre">
-          <i class="fas fa-building"></i> {{ e.departamentoNombre }}
-        </span>
-        <span class="tag-tarifa" *ngIf="e.tarifaHora">
-          <i class="fas fa-clock"></i> {{ e.tarifaHora | number:'1.2-2' }} €/h
-        </span>
+  <div class="empleados-grid" *ngIf="empleados.length > 0; else sinEmpleados">
+    <div class="empleado-card" *ngFor="let e of empleados">
+      <div class="empleado-avatar">{{ inicialesEmpleado(e) }}</div>
+      <div class="empleado-info">
+        <h3>{{ e.nombreCompleto }}</h3>
+        <p class="empleado-email">
+          <i class="fas fa-envelope"></i>
+          {{ e.emailCorporativo || 'Sin email' }}
+        </p>
+        <div class="empleado-meta">
+          <span class="tag-dept" *ngIf="e.departamentoNombre">
+            <i class="fas fa-building"></i> {{ e.departamentoNombre }}
+          </span>
+          <span class="tag-tarifa" *ngIf="e.tarifaHora">
+            <i class="fas fa-clock"></i> {{ e.tarifaHora | number:'1.2-2' }} €/h
+          </span>
+        </div>
+      </div>
+      <div class="empleado-acciones">
+        <button class="btn-icon btn-view" title="Ver detalle" (click)="verDetalle(e)">
+          <i class="fas fa-eye"></i>
+        </button>
+        <button class="btn-icon btn-edit" title="Editar" (click)="abrirEdicion(e)">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button class="btn-icon btn-delete" title="Eliminar" (click)="eliminar(e.id!)">
+          <i class="fas fa-trash"></i>
+        </button>
       </div>
     </div>
+  </div>
 
-    <div class="empleado-acciones">
-      <button class="btn-icon btn-edit" (click)="prepararEdicion(e)" title="Editar">
-        <i class="fas fa-edit"></i>
-      </button>
-      <button class="btn-icon btn-delete" (click)="eliminar(e.id!)" title="Eliminar">
-        <i class="fas fa-trash"></i>
+  <ng-template #sinEmpleados>
+    <div class="empty-state">
+      <i class="fas fa-users fa-2x"></i>
+      <p>No hay empleados registrados aún.</p>
+      <button class="btn-primary mt-1" (click)="abrirFormularioNuevo()">
+        Crear primer empleado
       </button>
     </div>
+  </ng-template>
 
-  </div>
-</div>
+</ng-container>
 
-<ng-template #sinEmpleados>
-  <div class="empty-state">
-    <i class="fas fa-users fa-2x"></i>
-    <p>No hay empleados registrados aún.</p>
-  </div>
-</ng-template>
+
+<!-- ══ VISTA FORMULARIO ══ -->
+<ng-container *ngIf="vista === 'form'">
+
+  <header class="content-header">
+    <div>
+      <h1>{{ modoEdicion ? 'Editar Empleado' : 'Nuevo Empleado' }}</h1>
+      <p>Completa los datos del empleado</p>
+    </div>
+    <button class="btn-secondary" (click)="volverALista()">
+      <i class="fas fa-arrow-left"></i> Volver
+    </button>
+  </header>
+
+  <form (ngSubmit)="guardar()">
+    <section class="inventory-card mb-4">
+      <h4 class="form-title">Datos Personales</h4>
+      <div class="form-grid">
+
+        <div class="field-group">
+          <label>Nombre *</label>
+          <input [(ngModel)]="nuevoEmpleado.nombre" name="nombre"
+                 placeholder="Ana" class="form-input" required />
+        </div>
+
+        <div class="field-group">
+          <label>Apellidos *</label>
+          <input [(ngModel)]="nuevoEmpleado.apellidos" name="apellidos"
+                 placeholder="García López" class="form-input" required />
+        </div>
+
+        <div class="field-group">
+          <label>Email Corporativo</label>
+          <input [(ngModel)]="nuevoEmpleado.emailCorporativo" name="email"
+                 type="email" placeholder="ana@principal33.com" class="form-input" />
+        </div>
+
+      </div>
+    </section>
+
+    <section class="inventory-card mb-4">
+      <h4 class="form-title">Datos Laborales</h4>
+      <div class="form-grid">
+
+        <div class="field-group">
+          <label>Departamento</label>
+          <select [(ngModel)]="nuevoEmpleado.departamentoId" name="departamento" class="form-input">
+            <option [ngValue]="null">Sin departamento</option>
+            <option *ngFor="let d of departamentos" [value]="d.id">{{ d.nombre }}</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label>Tarifa / Hora (€)</label>
+          <input [(ngModel)]="nuevoEmpleado.tarifaHora" name="tarifa"
+                 type="number" min="0" step="0.01" class="form-input" />
+        </div>
+
+      </div>
+    </section>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-primary"
+              [disabled]="!nuevoEmpleado.nombre || !nuevoEmpleado.apellidos">
+        <i class="fas fa-save"></i> {{ modoEdicion ? 'Actualizar' : 'Guardar' }}
+      </button>
+      <button type="button" class="btn-secondary" (click)="volverALista()">Cancelar</button>
+    </div>
+
+  </form>
+
+</ng-container>
+
+
+<!-- ══ VISTA DETALLE ══ -->
+<ng-container *ngIf="vista === 'detalle' && empleadoDetalle">
+
+  <header class="content-header">
+    <div>
+      <h1>{{ empleadoDetalle.nombreCompleto }}</h1>
+      <p>{{ empleadoDetalle.departamentoNombre || 'Sin departamento' }}</p>
+    </div>
+    <div class="detalle-actions">
+      <button class="btn-primary" (click)="abrirEdicion(empleadoDetalle)">
+        <i class="fas fa-edit"></i> Editar
+      </button>
+      <button class="btn-danger" (click)="eliminar(empleadoDetalle.id!)">
+        <i class="fas fa-trash"></i> Eliminar
+      </button>
+      <button class="btn-secondary" (click)="volverALista()">
+        <i class="fas fa-arrow-left"></i> Volver
+      </button>
+    </div>
+  </header>
+
+  <section class="inventory-card mb-4">
+    <h4 class="form-title">Datos Personales</h4>
+    <div class="detalle-grid">
+      <div class="detalle-item">
+        <label>Nombre completo</label>
+        <span>{{ empleadoDetalle.nombreCompleto }}</span>
+      </div>
+      <div class="detalle-item">
+        <label>Email corporativo</label>
+        <span class="email-link">{{ empleadoDetalle.emailCorporativo || '—' }}</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="inventory-card">
+    <h4 class="form-title">Datos Laborales</h4>
+    <div class="detalle-grid">
+      <div class="detalle-item">
+        <label>Departamento</label>
+        <span>
+          <span class="tag-dept" *ngIf="empleadoDetalle.departamentoNombre">
+            <i class="fas fa-building"></i> {{ empleadoDetalle.departamentoNombre }}
+          </span>
+          <span *ngIf="!empleadoDetalle.departamentoNombre">—</span>
+        </span>
+      </div>
+      <div class="detalle-item">
+        <label>Tarifa / Hora</label>
+        <span class="tag-tarifa" *ngIf="empleadoDetalle.tarifaHora">
+          <i class="fas fa-clock"></i> {{ empleadoDetalle.tarifaHora | number:'1.2-2' }} €/h
+        </span>
+        <span *ngIf="!empleadoDetalle.tarifaHora">—</span>
+      </div>
+    </div>
+  </section>
+
+</ng-container>

@@ -1,8 +1,6 @@
 <div class="pill-notificacion" *ngIf="notificacion">{{ notificacion }}</div>
 
-
 <ng-container *ngIf="vista === 'lista'">
-
   <header class="content-header">
     <div>
       <h1>Facturas de Ventas</h1>
@@ -16,14 +14,19 @@
   <div class="filtros-bar">
     <label class="filtro-label">Filtrar por estado:</label>
     <div class="filtro-pills">
-      <button [class.active]="filtroEstado === ''"
-              (click)="filtroEstado = ''; aplicarFiltro()" class="pill-btn">
+      <button
+        [class.active]="filtroEstado === ''"
+        (click)="filtroEstado = ''; aplicarFiltro()"
+        class="pill-btn"
+      >
         Todas
       </button>
-      <button *ngFor="let e of estados"
-              [class.active]="filtroEstado === e"
-              [class]="'pill-btn ' + badgeClass(e)"
-              (click)="filtroEstado = e; aplicarFiltro()">
+      <button
+        *ngFor="let e of estados"
+        [class.active]="filtroEstado === e"
+        [class]="'pill-btn ' + badgeClass(e)"
+        (click)="filtroEstado = e; aplicarFiltro()"
+      >
         {{ e }}
       </button>
     </div>
@@ -45,12 +48,16 @@
       </thead>
       <tbody>
         <tr *ngFor="let f of facturas">
-          <td><code class="numero-factura">{{ f.numeroFactura }}</code></td>
-          <td><strong>{{ f.clienteRazonSocial }}</strong></td>
+          <td>
+            <code class="numero-factura">{{ f.numeroFactura }}</code>
+          </td>
+          <td>
+            <strong>{{ f.clienteRazonSocial }}</strong>
+          </td>
           <td>{{ f.fechaEmision }}</td>
           <td>{{ f.fechaPago || '—' }}</td>
-          <td>{{ f.baseImponible | number:'1.2-2' }} €</td>
-          <td class="total-col">{{ f.totalEur | number:'1.2-2' }} €</td>
+          <td>{{ f.baseImponible | number: '1.2-2' }} €</td>
+          <td class="total-col">{{ f.totalEur | number: '1.2-2' }} €</td>
           <td>
             <span [class]="'badge ' + badgeClass(f.estado)">{{ f.estado }}</span>
           </td>
@@ -61,22 +68,35 @@
             <button class="btn-icon btn-pdf" title="Exportar PDF" (click)="generarPdf(f)">
               <i class="fas fa-file-pdf"></i>
             </button>
-            <button class="btn-icon btn-edit" title="Editar"
-                    *ngIf="f.estado === 'BORRADOR'" (click)="abrirEdicion(f)">
+            <button
+              class="btn-icon btn-edit"
+              title="Editar"
+              *ngIf="f.estado === 'BORRADOR'"
+              (click)="abrirEdicion(f)"
+            >
               <i class="fas fa-edit"></i>
             </button>
             <ng-container *ngFor="let t of transicionesPosibles(f.estado)">
-              <button [class]="'btn-icon btn-estado-' + t.toLowerCase()"
-                      [title]="'Marcar como ' + t"
-                      (click)="cambiarEstado(f.id, t)">
-                <i class="fas"
-                   [class.fa-paper-plane]="t === 'EMITIDA'"
-                   [class.fa-check-circle]="t === 'PAGADA'"
-                   [class.fa-ban]="t === 'CANCELADA'"></i>
+              <button
+                [class]="'btn-icon btn-estado-' + t.toLowerCase()"
+                [title]="'Marcar como ' + t"
+                (click)="cambiarEstado(f.id, t)"
+              >
+                <i
+                  class="fas"
+                  [class.fa-paper-plane]="t === 'EMITIDA'"
+                  [class.fa-check-circle]="t === 'PAGADA'"
+                  [class.fa-ban]="t === 'CANCELADA'"
+                ></i>
               </button>
             </ng-container>
-            <button class="btn-icon btn-delete" title="Eliminar"
-                    *ngIf="f.estado === 'BORRADOR'" (click)="eliminar(f.id)">
+
+            <button
+              class="btn-icon btn-delete"
+              title="Eliminar"
+              *ngIf="f.estado === 'BORRADOR'"
+              (click)="eliminar(f.id)"
+            >
               <i class="fas fa-trash"></i>
             </button>
           </td>
@@ -110,14 +130,19 @@
   <div class="filtros-bar">
     <label class="filtro-label">Filtrar por estado:</label>
     <div class="filtro-pills">
-      <button [class.active]="filtroEstadoCompra === ''"
-              (click)="filtroEstadoCompra = ''; cargarCompras()" class="pill-btn">
+      <button
+        [class.active]="filtroEstadoCompra === ''"
+        (click)="filtroEstadoCompra = ''; cargarCompras()"
+        class="pill-btn"
+      >
         Todas
       </button>
-      <button *ngFor="let e of estados"
-              [class.active]="filtroEstadoCompra === e"
-              [class]="'pill-btn ' + badgeClass(e)"
-              (click)="filtroEstadoCompra = e; cargarCompras()">
+      <button
+        *ngFor="let e of estados"
+        [class.active]="filtroEstadoCompra === e"
+        [class]="'pill-btn ' + badgeClass(e)"
+        (click)="filtroEstadoCompra = e; cargarCompras()"
+      >
         {{ e }}
       </button>
     </div>
@@ -139,12 +164,16 @@
       </thead>
       <tbody>
         <tr *ngFor="let c of compras">
-          <td><code class="numero-factura">{{ c.numeroFactura }}</code></td>
-          <td><strong>{{ c.proveedor || '—' }}</strong></td>
+          <td>
+            <code class="numero-factura">{{ c.numeroFactura }}</code>
+          </td>
+          <td>
+            <strong>{{ c.proveedor || '—' }}</strong>
+          </td>
           <td>{{ c.fechaEmision }}</td>
           <td>{{ c.fechaPago || '—' }}</td>
-          <td>{{ c.baseImponible | number:'1.2-2' }} €</td>
-          <td class="total-col">{{ c.totalEur | number:'1.2-2' }} €</td>
+          <td>{{ c.baseImponible | number: '1.2-2' }} €</td>
+          <td class="total-col">{{ c.totalEur | number: '1.2-2' }} €</td>
           <td>
             <span [class]="'badge ' + badgeClass(c.estado)">{{ c.estado }}</span>
           </td>
@@ -152,18 +181,29 @@
             <button class="btn-icon btn-view" title="Ver detalle" (click)="verDetalleCompra(c)">
               <i class="fas fa-eye"></i>
             </button>
+            <button class="btn-icon btn-pdf" title="Exportar PDF" (click)="generarPdfCompra(c)">
+              <i class="fas fa-file-pdf"></i>
+            </button>
             <ng-container *ngFor="let t of transicionesPosibles(c.estado)">
-              <button [class]="'btn-icon btn-estado-' + t.toLowerCase()"
-                      [title]="'Marcar como ' + t"
-                      (click)="cambiarEstadoCompra(c.id, t)">
-                <i class="fas"
-                   [class.fa-paper-plane]="t === 'EMITIDA'"
-                   [class.fa-check-circle]="t === 'PAGADA'"
-                   [class.fa-ban]="t === 'CANCELADA'"></i>
+              <button
+                [class]="'btn-icon btn-estado-' + t.toLowerCase()"
+                [title]="'Marcar como ' + t"
+                (click)="cambiarEstadoCompra(c.id, t)"
+              >
+                <i
+                  class="fas"
+                  [class.fa-paper-plane]="t === 'EMITIDA'"
+                  [class.fa-check-circle]="t === 'PAGADA'"
+                  [class.fa-ban]="t === 'CANCELADA'"
+                ></i>
               </button>
             </ng-container>
-            <button class="btn-icon btn-delete" title="Eliminar"
-                    *ngIf="c.estado === 'BORRADOR'" (click)="eliminarCompra(c.id)">
+            <button
+              class="btn-icon btn-delete"
+              title="Eliminar"
+              *ngIf="c.estado === 'BORRADOR'"
+              (click)="eliminarCompra(c.id)"
+            >
               <i class="fas fa-trash"></i>
             </button>
           </td>
@@ -181,14 +221,11 @@
       </div>
     </ng-template>
   </section>
-
 </ng-container>
-
 
 <!-- ══ FORMULARIO VENTAS ══ -->
 
 <ng-container *ngIf="vista === 'form'">
-
   <header class="content-header">
     <div>
       <h1>{{ modoEdicion ? 'Editar Factura' : 'Nueva Factura' }}</h1>
@@ -200,15 +237,12 @@
   </header>
 
   <form (ngSubmit)="guardar()">
-
     <section class="inventory-card mb-4">
       <h4 class="form-title">Datos de la Factura</h4>
       <div class="form-grid">
-
         <div class="field-group">
           <label>Cliente *</label>
-          <select [(ngModel)]="nuevaFactura.clienteId" name="clienteId"
-                  class="form-input" required>
+          <select [(ngModel)]="nuevaFactura.clienteId" name="clienteId" class="form-input" required>
             <option [value]="0" disabled>Seleccionar cliente...</option>
             <option *ngFor="let c of clientes" [value]="c.id">
               {{ c.razonSocial }} — {{ c.cifVies }}
@@ -218,16 +252,26 @@
 
         <div class="field-group">
           <label>Fecha de Emisión *</label>
-          <input [(ngModel)]="nuevaFactura.fechaEmision" name="fechaEmision"
-                 type="date" class="form-input" required />
+          <input
+            [(ngModel)]="nuevaFactura.fechaEmision"
+            name="fechaEmision"
+            type="date"
+            class="form-input"
+            required
+          />
         </div>
 
         <div class="field-group">
           <label>IVA (%)</label>
-          <input [(ngModel)]="nuevaFactura.ivaPorcentaje" name="iva"
-                 type="number" min="0" max="100" class="form-input" />
+          <input
+            [(ngModel)]="nuevaFactura.ivaPorcentaje"
+            name="iva"
+            type="number"
+            min="0"
+            max="100"
+            class="form-input"
+          />
         </div>
-
       </div>
     </section>
 
@@ -249,31 +293,53 @@
 
           <div class="field-group flex-3">
             <label>Descripción *</label>
-            <input [(ngModel)]="linea.descripcion" [name]="'desc_' + i"
-                   (ngModelChange)="actualizarPrecioDescripcion(linea)"
-                   list="serviciosInventario"
-                   placeholder="Servicio o producto" class="form-input" required />
+            <input
+              [(ngModel)]="linea.descripcion"
+              [name]="'desc_' + i"
+              (ngModelChange)="actualizarPrecioDescripcion(linea)"
+              list="serviciosInventario"
+              placeholder="Servicio o producto"
+              class="form-input"
+              required
+            />
           </div>
 
           <div class="field-group flex-1">
             <label>Cantidad</label>
-            <input [(ngModel)]="linea.cantidad" [name]="'qty_' + i"
-                   type="number" min="1" class="form-input" />
+            <input
+              [(ngModel)]="linea.cantidad"
+              [name]="'qty_' + i"
+              type="number"
+              min="1"
+              class="form-input"
+            />
           </div>
 
           <div class="field-group flex-2">
             <label>Precio Unitario (€)</label>
-            <input [(ngModel)]="linea.precioUnitario" [name]="'precio_' + i"
-                   type="number" min="0" step="0.01" class="form-input" />
+            <input
+              [(ngModel)]="linea.precioUnitario"
+              [name]="'precio_' + i"
+              type="number"
+              min="0"
+              step="0.01"
+              class="form-input"
+            />
           </div>
 
           <div class="field-group flex-2">
             <label>Subtotal</label>
-            <div class="subtotal-display">{{ calcularSubtotalLinea(linea) | number:'1.2-2' }} €</div>
+            <div class="subtotal-display">
+              {{ calcularSubtotalLinea(linea) | number: '1.2-2' }} €
+            </div>
           </div>
 
-          <button type="button" class="btn-remove-linea"
-                  (click)="eliminarLinea(i)" title="Eliminar línea">
+          <button
+            type="button"
+            class="btn-remove-linea"
+            (click)="eliminarLinea(i)"
+            title="Eliminar línea"
+          >
             <i class="fas fa-times"></i>
           </button>
         </div>
@@ -286,39 +352,48 @@
       <div class="totales-box" *ngIf="nuevaFactura.lineas.length > 0">
         <div class="total-row">
           <span>Base Imponible</span>
-          <span>{{ calcularBaseImponible() | number:'1.2-2' }} €</span>
+          <span>{{ calcularBaseImponible() | number: '1.2-2' }} €</span>
         </div>
         <div class="total-row">
           <span>IVA ({{ nuevaFactura.ivaPorcentaje }}%)</span>
-          <span>{{ (calcularBaseImponible() * nuevaFactura.ivaPorcentaje / 100) | number:'1.2-2' }} €</span>
+          <span
+            >{{
+              (calcularBaseImponible() * nuevaFactura.ivaPorcentaje) / 100 | number: '1.2-2'
+            }}
+            €</span
+          >
         </div>
         <div class="total-row total-final">
           <span>TOTAL</span>
-          <span>{{ calcularTotalConIva() | number:'1.2-2' }} €</span>
+          <span>{{ calcularTotalConIva() | number: '1.2-2' }} €</span>
         </div>
       </div>
     </section>
 
     <div class="form-actions">
-      <button type="submit" class="btn-primary"
-              [disabled]="!nuevaFactura.clienteId || nuevaFactura.lineas.length === 0">
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="!nuevaFactura.clienteId || nuevaFactura.lineas.length === 0"
+      >
         <i class="fas fa-save"></i> {{ modoEdicion ? 'Actualizar Factura' : 'Crear Factura' }}
       </button>
-      <button type="button" class="btn-secondary" (click)="generarPdf(nuevaFactura)"
-              [disabled]="!nuevaFactura.clienteId || nuevaFactura.lineas.length === 0">
+      <button
+        type="button"
+        class="btn-secondary"
+        (click)="generarPdf(nuevaFactura)"
+        [disabled]="!nuevaFactura.clienteId || nuevaFactura.lineas.length === 0"
+      >
         <i class="fas fa-file-pdf"></i> Exportar PDF
       </button>
       <button type="button" class="btn-secondary" (click)="volverALista()">Cancelar</button>
     </div>
-
   </form>
 </ng-container>
-
 
 <!-- ══ DETALLE VENTAS ══ -->
 
 <ng-container *ngIf="vista === 'detalle' && facturaDetalle">
-
   <header class="content-header">
     <div>
       <h1>{{ facturaDetalle.numeroFactura }}</h1>
@@ -352,11 +427,16 @@
       </div>
       <div class="detalle-item">
         <label>Base Imponible</label>
-        <span>{{ facturaDetalle.baseImponible | number:'1.2-2' }} €</span>
+        <span>{{ facturaDetalle.baseImponible | number: '1.2-2' }} €</span>
       </div>
       <div class="detalle-item">
         <label>IVA ({{ facturaDetalle.ivaPorcentaje }}%)</label>
-        <span>{{ (facturaDetalle.baseImponible * facturaDetalle.ivaPorcentaje / 100) | number:'1.2-2' }} €</span>
+        <span
+          >{{
+            (facturaDetalle.baseImponible * facturaDetalle.ivaPorcentaje) / 100 | number: '1.2-2'
+          }}
+          €</span
+        >
       </div>
       <div class="detalle-item">
         <label>Email empresa</label>
@@ -364,7 +444,7 @@
       </div>
       <div class="detalle-item total-item">
         <label>TOTAL</label>
-        <span>{{ facturaDetalle.totalEur | number:'1.2-2' }} €</span>
+        <span>{{ facturaDetalle.totalEur | number: '1.2-2' }} €</span>
       </div>
     </div>
   </section>
@@ -387,21 +467,20 @@
           <td>{{ i + 1 }}</td>
           <td>{{ l.descripcion }}</td>
           <td>{{ l.cantidad }}</td>
-          <td>{{ l.precioUnitario | number:'1.2-2' }} €</td>
-          <td><strong>{{ l.subtotal | number:'1.2-2' }} €</strong></td>
+          <td>{{ l.precioUnitario | number: '1.2-2' }} €</td>
+          <td>
+            <strong>{{ l.subtotal | number: '1.2-2' }} €</strong>
+          </td>
           <td>{{ l.activoNombre || '—' }}</td>
         </tr>
       </tbody>
     </table>
   </section>
-
 </ng-container>
-
 
 <!-- ══ FORMULARIO COMPRA ══ -->
 
 <ng-container *ngIf="vista === 'form-compra'">
-
   <header class="content-header">
     <div>
       <h1>Nueva Compra</h1>
@@ -413,35 +492,53 @@
   </header>
 
   <form (ngSubmit)="guardarCompra()">
-
     <section class="inventory-card mb-4">
       <h4 class="form-title">Datos de la Compra</h4>
       <div class="form-grid">
-
         <div class="field-group">
           <label>Proveedor</label>
-          <input [(ngModel)]="nuevaCompra.proveedor" name="proveedor"
-                 type="text" class="form-input" placeholder="Nombre del proveedor (opcional)" />
+          <input
+            [(ngModel)]="nuevaCompra.proveedor"
+            name="proveedor"
+            type="text"
+            class="form-input"
+            placeholder="Nombre del proveedor (opcional)"
+          />
         </div>
 
         <div class="field-group">
           <label>Fecha de Emisión *</label>
-          <input [(ngModel)]="nuevaCompra.fechaEmision" name="fechaEmision"
-                 type="date" class="form-input" required />
+          <input
+            [(ngModel)]="nuevaCompra.fechaEmision"
+            name="fechaEmision"
+            type="date"
+            class="form-input"
+            required
+          />
         </div>
 
         <div class="field-group">
           <label>IVA (%)</label>
-          <input [(ngModel)]="nuevaCompra.ivaPorcentaje" name="iva"
-                 type="number" min="0" max="100" class="form-input" />
+          <input
+            [(ngModel)]="nuevaCompra.ivaPorcentaje"
+            name="iva"
+            type="number"
+            min="0"
+            max="100"
+            class="form-input"
+          />
         </div>
 
         <div class="field-group">
           <label>Notas</label>
-          <input [(ngModel)]="nuevaCompra.notas" name="notas"
-                 type="text" class="form-input" placeholder="Observaciones opcionales" />
+          <input
+            [(ngModel)]="nuevaCompra.notas"
+            name="notas"
+            type="text"
+            class="form-input"
+            placeholder="Observaciones opcionales"
+          />
         </div>
-
       </div>
     </section>
 
@@ -463,33 +560,53 @@
 
           <div class="field-group flex-3">
             <label>Descripción *</label>
-            <input [(ngModel)]="linea.descripcion" [name]="'cdesc_' + i"
-                   list="activosInventarioCompra"
-                   (ngModelChange)="actualizarActivoCompra(linea)"
-                   placeholder="Producto o servicio" class="form-input" required />
+            <input
+              [(ngModel)]="linea.descripcion"
+              [name]="'cdesc_' + i"
+              list="activosInventarioCompra"
+              (ngModelChange)="actualizarActivoCompra(linea)"
+              placeholder="Producto o servicio"
+              class="form-input"
+              required
+            />
           </div>
 
           <div class="field-group flex-1">
             <label>Cantidad</label>
-            <input [(ngModel)]="linea.cantidad" [name]="'cqty_' + i"
-                   type="number" min="1" class="form-input" />
+            <input
+              [(ngModel)]="linea.cantidad"
+              [name]="'cqty_' + i"
+              type="number"
+              min="1"
+              class="form-input"
+            />
           </div>
 
           <div class="field-group flex-2">
             <label>Precio Unitario (€)</label>
-            <input [(ngModel)]="linea.precioUnitario" [name]="'cprecio_' + i"
-                   type="number" min="0" step="0.01" class="form-input" />
+            <input
+              [(ngModel)]="linea.precioUnitario"
+              [name]="'cprecio_' + i"
+              type="number"
+              min="0"
+              step="0.01"
+              class="form-input"
+            />
           </div>
 
           <div class="field-group flex-2">
             <label>Subtotal</label>
             <div class="subtotal-display">
-              {{ calcularSubtotalLineaCompra(linea) | number:'1.2-2' }} €
+              {{ calcularSubtotalLineaCompra(linea) | number: '1.2-2' }} €
             </div>
           </div>
 
-          <button type="button" class="btn-remove-linea"
-                  (click)="eliminarLineaCompra(i)" title="Eliminar línea">
+          <button
+            type="button"
+            class="btn-remove-linea"
+            (click)="eliminarLineaCompra(i)"
+            title="Eliminar línea"
+          >
             <i class="fas fa-times"></i>
           </button>
         </div>
@@ -502,35 +619,36 @@
       <div class="totales-box" *ngIf="nuevaCompra.lineas.length > 0">
         <div class="total-row">
           <span>Base Imponible</span>
-          <span>{{ calcularBaseCompra() | number:'1.2-2' }} €</span>
+          <span>{{ calcularBaseCompra() | number: '1.2-2' }} €</span>
         </div>
         <div class="total-row">
           <span>IVA ({{ nuevaCompra.ivaPorcentaje }}%)</span>
-          <span>{{ (calcularBaseCompra() * nuevaCompra.ivaPorcentaje / 100) | number:'1.2-2' }} €</span>
+          <span
+            >{{
+              (calcularBaseCompra() * nuevaCompra.ivaPorcentaje) / 100 | number: '1.2-2'
+            }}
+            €</span
+          >
         </div>
         <div class="total-row total-final">
           <span>TOTAL</span>
-          <span>{{ calcularTotalCompra() | number:'1.2-2' }} €</span>
+          <span>{{ calcularTotalCompra() | number: '1.2-2' }} €</span>
         </div>
       </div>
     </section>
 
     <div class="form-actions">
-      <button type="submit" class="btn-primary"
-              [disabled]="nuevaCompra.lineas.length === 0">
+      <button type="submit" class="btn-primary" [disabled]="nuevaCompra.lineas.length === 0">
         <i class="fas fa-save"></i> Registrar Compra
       </button>
       <button type="button" class="btn-secondary" (click)="volverALista()">Cancelar</button>
     </div>
-
   </form>
 </ng-container>
-
 
 <!-- ══ DETALLE COMPRA ══ -->
 
 <ng-container *ngIf="vista === 'detalle-compra' && compraDetalle">
-
   <header class="content-header">
     <div>
       <h1>{{ compraDetalle.numeroFactura }}</h1>
@@ -559,15 +677,20 @@
       </div>
       <div class="detalle-item">
         <label>Base Imponible</label>
-        <span>{{ compraDetalle.baseImponible | number:'1.2-2' }} €</span>
+        <span>{{ compraDetalle.baseImponible | number: '1.2-2' }} €</span>
       </div>
       <div class="detalle-item">
         <label>IVA ({{ compraDetalle.ivaPorcentaje }}%)</label>
-        <span>{{ (compraDetalle.baseImponible * compraDetalle.ivaPorcentaje / 100) | number:'1.2-2' }} €</span>
+        <span
+          >{{
+            (compraDetalle.baseImponible * compraDetalle.ivaPorcentaje) / 100 | number: '1.2-2'
+          }}
+          €</span
+        >
       </div>
       <div class="detalle-item total-item">
         <label>TOTAL</label>
-        <span>{{ compraDetalle.totalEur | number:'1.2-2' }} €</span>
+        <span>{{ compraDetalle.totalEur | number: '1.2-2' }} €</span>
       </div>
       <div class="detalle-item" *ngIf="compraDetalle.notas">
         <label>Notas</label>
@@ -594,12 +717,13 @@
           <td>{{ i + 1 }}</td>
           <td>{{ l.descripcion }}</td>
           <td>{{ l.cantidad }}</td>
-          <td>{{ l.precioUnitario | number:'1.2-2' }} €</td>
-          <td><strong>{{ l.subtotal | number:'1.2-2' }} €</strong></td>
+          <td>{{ l.precioUnitario | number: '1.2-2' }} €</td>
+          <td>
+            <strong>{{ l.subtotal | number: '1.2-2' }} €</strong>
+          </td>
           <td>{{ l.activoNombre || '—' }}</td>
         </tr>
       </tbody>
     </table>
   </section>
-
 </ng-container>
